@@ -1,0 +1,28 @@
+name: 翻译问题
+description: 报告漏译、错译、术语或语境问题
+title: "[翻译] "
+labels: ["translation"]
+body:
+  - type: input
+    id: game
+    attributes:
+      label: 游戏名
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: 出现位置与当前译文
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: 建议译文与理由
+      description: 如果知道英文原文或上下文，请一并提供。
+    validations:
+      required: true
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: 截图

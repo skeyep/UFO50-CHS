@@ -1,0 +1,44 @@
+# 维护与发布工作流
+
+## 翻译
+
+1. 从维护者合法持有的英文资源提取稳定键名和原文。
+2. 参考官方日文确认称呼、语气和版面关系。
+3. 按整款游戏人工翻译，并在 `source/translations/` 维护键名驱动的中文值。
+4. 运行键数、占位符、控制符和布局字段审计。
+5. 生成 `payload/ext/JAPANESE/` 中文槽文件。
+6. 在游戏内检查字体覆盖、基线、换行、图标和语境。
+
+用户负责最终验收，但不承担项目翻译和校对工作。
+
+## data.win 构建
+
+维护者需要在本地准备：
+
+- 与 `release-config.json` 哈希一致的干净原版 `data.win`；
+- 官方 UndertaleModTool CLI；
+- 本仓库 `payload/patch-font.csx`。
+
+示例：
+
+```powershell
+.\scripts\rebuild-data.ps1 `
+  -BaselineDataWin C:\private\ufo50\data.win `
+  -UtmtExe C:\private\utmt\UndertaleModCli.exe `
+  -OutputPath C:\private\build\data.win
+```
+
+脚本会同时检查原版输入哈希和补丁输出哈希。私有输入与输出不得提交。
+
+## Release
+
+1. 更新 `release-config.json` 的版本、支持原版哈希和预期补丁哈希。
+2. 运行 `scripts/validate-repository.ps1`。
+3. 使用私有原版基线完成一次 `rebuild-data.ps1`。
+4. 运行 `scripts/build-release.ps1` 生成 ZIP 和 SHA-256。
+5. 在隔离目录中放置原版 `data.win` 与一个测试用 `ufo50.exe` 占位文件。
+6. 从 ZIP 执行安装，核对补丁哈希、字体哈希和 52 个文本文件。
+7. 执行卸载，确认 `data.win` 精确恢复到原版哈希。
+8. 将 ZIP 和 `.sha256` 上传到对应 GitHub 预发行版。
+
+v0.1.0 是首次跑通全流程的测试版；后续问题通过 Issue 记录，修复通过 PR 合并，并由新的 Release 分发。

@@ -1,0 +1,311 @@
+{
+  "version": "0.1.0",
+  "generatedAt": "2026-08-14T18:35:06.9255804Z",
+  "files": [
+    {
+      "path": "Install-UFO50-CHS.cmd",
+      "sha256": "EA0DC26DF325B2E4AC6400CF98DF4F6473305068D1195F5EE85E533E919BA45B",
+      "size": 354
+    },
+    {
+      "path": "installer/Common.ps1",
+      "sha256": "6B3C07D4B90108781043270608972AA8025CB0F4F579097AA0008B2A758A86EA",
+      "size": 7856
+    },
+    {
+      "path": "installer/Install-UFO50-CHS.ps1",
+      "sha256": "CB55FC5E24CFF4BFB5893209B91D1EC6948ACA29AE802B950C3B44F941E2EE99",
+      "size": 7802
+    },
+    {
+      "path": "installer/Uninstall-UFO50-CHS.ps1",
+      "sha256": "48B02772E2CF94F00061E40F3854828637A190F182FEDEA82C798E32771129E0",
+      "size": 1256
+    },
+    {
+      "path": "payload/ext/JAPANESE/0_Text.json",
+      "sha256": "B82E7D38ABE627C9DAE815D1AB1BBAB59DEA8EB21C77FD96683665FE01A3C94B",
+      "size": 52580
+    },
+    {
+      "path": "payload/ext/JAPANESE/1_Text.json",
+      "sha256": "3E666144EA51986F59AB3CFF32C6A232724013D280816B4B76AE44009B61C6F9",
+      "size": 3340
+    },
+    {
+      "path": "payload/ext/JAPANESE/10_Text.json",
+      "sha256": "1BC7E14B3D311C9EDA40CC6172C63C319A083016B4966C07FF828799227E762B",
+      "size": 27908
+    },
+    {
+      "path": "payload/ext/JAPANESE/11_Text.json",
+      "sha256": "ADE744F5243DCFBCE73687B51EA03A88ED99781BDF27DE21765AA1C6440B1EDB",
+      "size": 1784
+    },
+    {
+      "path": "payload/ext/JAPANESE/12_Text.json",
+      "sha256": "17636FA665738E6BB60A5C80B66FD61F7DCDFCC62A2E63BF7D0D60A2221C248A",
+      "size": 184432
+    },
+    {
+      "path": "payload/ext/JAPANESE/13_Text.json",
+      "sha256": "1F01B4237D778BBAC8E99021E8770D9AB096913BAFD69393A0607CF04AEE17F0",
+      "size": 18960
+    },
+    {
+      "path": "payload/ext/JAPANESE/14_Text.json",
+      "sha256": "86B15B6C231D2E6E17E7A3B7A97BB54F8D84C8AEA47FD8F24F6D80E3D133959E",
+      "size": 22148
+    },
+    {
+      "path": "payload/ext/JAPANESE/15_Text.json",
+      "sha256": "D184BD4CDF23B0F4DFE803F6E551DACFE03D0BF67028815A47828350ACEABD5E",
+      "size": 4324
+    },
+    {
+      "path": "payload/ext/JAPANESE/16_Text.json",
+      "sha256": "EC2DF66BF66507274E060E8D642C84A6CB77A6E0B5BE50E674BDF29A024CCEAD",
+      "size": 7208
+    },
+    {
+      "path": "payload/ext/JAPANESE/17_Text.json",
+      "sha256": "6569CAE110305588135C4A596FE4322BC937BA25C2AFC04244B35C1374A1A7A0",
+      "size": 2728
+    },
+    {
+      "path": "payload/ext/JAPANESE/18_Text.json",
+      "sha256": "0D58028174C179481C674D7AD6B36B8A40DC3F7F45B98F749DC56D8DD962292C",
+      "size": 10640
+    },
+    {
+      "path": "payload/ext/JAPANESE/19_Text.json",
+      "sha256": "10FD459837E9C42AE22444D40F90BF2FC942B12711653E78423F65557F156EE5",
+      "size": 10432
+    },
+    {
+      "path": "payload/ext/JAPANESE/2_Text.json",
+      "sha256": "A66060436393E92BF1C290FA2A41F5F7F8D024B423756990FA46DC818781E541",
+      "size": 8236
+    },
+    {
+      "path": "payload/ext/JAPANESE/20_Text.json",
+      "sha256": "EDA2C60E8B8D28AFBC20E5DDD625AC6A9866F4A5EBE85ABDA93A93A02BEB810C",
+      "size": 16752
+    },
+    {
+      "path": "payload/ext/JAPANESE/21_Text.json",
+      "sha256": "A5E234A9DD768401FE4B1AD3330F86C433AA82C94ED7E95E874968F797344A2C",
+      "size": 10492
+    },
+    {
+      "path": "payload/ext/JAPANESE/22_Text.json",
+      "sha256": "122910B1187B64DDE22489FEBBB39AB86BF1913627EF6AD0CC6380BAC7DD4AB6",
+      "size": 8776
+    },
+    {
+      "path": "payload/ext/JAPANESE/23_Text.json",
+      "sha256": "5AE6753F1E41D7DCCB58599BB49B3DB0BB0D679C0F55318DD97C83A4F1B6CC43",
+      "size": 3432
+    },
+    {
+      "path": "payload/ext/JAPANESE/24_Text.json",
+      "sha256": "A58FA80C22D4464658AE4DCACEDA005059AF697739353657EAF4B2EA88086145",
+      "size": 1764
+    },
+    {
+      "path": "payload/ext/JAPANESE/25_Text.json",
+      "sha256": "7C837C26B03E4BD10A8325CAC1462CC97C1108A634443E73203571B93B3D20CE",
+      "size": 11260
+    },
+    {
+      "path": "payload/ext/JAPANESE/26_Text.json",
+      "sha256": "F621979251D4528254B246888E4845BDAC27EAF9ED2E3B4BF4018615D388C0E6",
+      "size": 1672
+    },
+    {
+      "path": "payload/ext/JAPANESE/27_Text.json",
+      "sha256": "F55723F9FB65111DFD3586178D6DB55F7B0EB32807946435D698DED98F019909",
+      "size": 2668
+    },
+    {
+      "path": "payload/ext/JAPANESE/28_Text.json",
+      "sha256": "AB6A46C507D10297CF8A245D9DD4486EC56E741E3486AA3115D8151FFC6A3BBD",
+      "size": 1796
+    },
+    {
+      "path": "payload/ext/JAPANESE/29_Text.json",
+      "sha256": "9F38D9860D5A6C37F647FA06C5445C76F08E7DE6EA3C33100BA3433574C3E3C7",
+      "size": 3648
+    },
+    {
+      "path": "payload/ext/JAPANESE/3_Text.json",
+      "sha256": "A57CD39768C312512A6A063D0BF05E682F11D898AAC37670B7CD4D73C2A7B34F",
+      "size": 2236
+    },
+    {
+      "path": "payload/ext/JAPANESE/30_Text.json",
+      "sha256": "CD2FB644AF9386A1E40A3BCCF54D2C7594302C8738A1B80BA032362956C4D3E2",
+      "size": 9624
+    },
+    {
+      "path": "payload/ext/JAPANESE/31_Text.json",
+      "sha256": "7181A89067B68EC82434AD2BE5684E00EF075D0BB316232C8CF19A9E93F5E0BF",
+      "size": 5908
+    },
+    {
+      "path": "payload/ext/JAPANESE/32_Text.json",
+      "sha256": "52849A9A7A6CCBCC2B85E4CA1459BCF0C6465BC60AF7F355EBB557AD2A3E28D5",
+      "size": 7688
+    },
+    {
+      "path": "payload/ext/JAPANESE/33_Text.json",
+      "sha256": "0CA325FCFB9BD96ECA60E603FF98C18129A7449BFDE297B4C93EDCDB091B0C94",
+      "size": 15004
+    },
+    {
+      "path": "payload/ext/JAPANESE/34_Text.json",
+      "sha256": "D9C532C973E27B27C4633A1ECF287E1DA3518445928601131E64A30C9395A0CB",
+      "size": 1340
+    },
+    {
+      "path": "payload/ext/JAPANESE/35_Text.json",
+      "sha256": "2EE27DA46ADF4305C9AD11625102E40F7C5CD9A307F487956E1C1CBAB302A6DE",
+      "size": 61520
+    },
+    {
+      "path": "payload/ext/JAPANESE/36_Text.json",
+      "sha256": "9BF71D6AE5430EE019410B93FC63DD8607A867AF13277A361DE55FCD15B5DD3F",
+      "size": 23628
+    },
+    {
+      "path": "payload/ext/JAPANESE/37_Text.json",
+      "sha256": "38E4F6B48FE0A7ED443FBCFEC0B0259B809805AD05EAA741E115AF716EF14B0C",
+      "size": 38168
+    },
+    {
+      "path": "payload/ext/JAPANESE/38_Text.json",
+      "sha256": "1442D5ED62494B4BC1F40F91351A269FD8341BEA65C4E9263D037F278D8BDFAD",
+      "size": 11060
+    },
+    {
+      "path": "payload/ext/JAPANESE/39_Text.json",
+      "sha256": "307F0B42FA7A450873A7D7421038EC1D91ABA91480D2F3B565735A6B30F2C23D",
+      "size": 193512
+    },
+    {
+      "path": "payload/ext/JAPANESE/4_Text.json",
+      "sha256": "FBC49E07CD02E8A5E384F540B014F10B6321728B89EE44907F1FCB6888810E19",
+      "size": 4128
+    },
+    {
+      "path": "payload/ext/JAPANESE/40_Text.json",
+      "sha256": "725EB99BD4280A0C1BBDD70ED9FA21FEEADDDD636433E6EE7FE36E18EA7F9E0C",
+      "size": 3264
+    },
+    {
+      "path": "payload/ext/JAPANESE/41_Text.json",
+      "sha256": "22492BE570F80835F6079812DB4C6E6FD60578BCD404565BB831834A31811297",
+      "size": 233192
+    },
+    {
+      "path": "payload/ext/JAPANESE/42_Text.json",
+      "sha256": "ACC632A7319CEF823180D2704B1860EC1DB73F016D9ED6862AE83431F98F0628",
+      "size": 8952
+    },
+    {
+      "path": "payload/ext/JAPANESE/43_Text.json",
+      "sha256": "FABF45A7DA250DA16E56130B0EAA8BB377710405F143F98A4CA8B50E602E4FE5",
+      "size": 11420
+    },
+    {
+      "path": "payload/ext/JAPANESE/44_Text.json",
+      "sha256": "430D514B1D8655576F571CB3A54503FC9BD9E29640A180AC87984DA003BF735A",
+      "size": 10412
+    },
+    {
+      "path": "payload/ext/JAPANESE/45_Text.json",
+      "sha256": "B027216E04BDF4280030225856CDD1E4B48E87EF945DB601C43197C2E6BCA675",
+      "size": 31508
+    },
+    {
+      "path": "payload/ext/JAPANESE/46_Text.json",
+      "sha256": "DA368FFFB8F6046F13B9F227A9D59B6883CC7F6A0FCD17D0E5986E1C248490B5",
+      "size": 7632
+    },
+    {
+      "path": "payload/ext/JAPANESE/47_Text.json",
+      "sha256": "9DE9AE8D539489504FBC4482198E45AA45F6E777DB8205D200140B8B19853302",
+      "size": 2864
+    },
+    {
+      "path": "payload/ext/JAPANESE/48_Text.json",
+      "sha256": "7A8F06F4E2DA148E61DCB275E8ABF36583AF2A73D4BAFE52B7D625C5E9EC0901",
+      "size": 18928
+    },
+    {
+      "path": "payload/ext/JAPANESE/49_Text.json",
+      "sha256": "1389E9B30D4D5E03FD90BE20717A60F3CBEAD3134FE541E0147D5193ED713B3E",
+      "size": 4064
+    },
+    {
+      "path": "payload/ext/JAPANESE/5_Text.json",
+      "sha256": "768F749A350784889AF2095D95E6275D98B77620089E4CB66B1759815BB6AC5E",
+      "size": 4316
+    },
+    {
+      "path": "payload/ext/JAPANESE/50_Text.json",
+      "sha256": "D0A618A66FC4DB220CB8AD676ADA213A09AF2654B3497695A6825422AC49BFAE",
+      "size": 23056
+    },
+    {
+      "path": "payload/ext/JAPANESE/6_Text.json",
+      "sha256": "EBE7824390466BCF3EF6BA9EFE57873EE3FA63A3A17840517D6C9135C9DC9A24",
+      "size": 27556
+    },
+    {
+      "path": "payload/ext/JAPANESE/7_Text.json",
+      "sha256": "A3CD606E024148EAC00DFEE43D6D8DF11F6327AF5817A39CB96F566EF2A1F590",
+      "size": 27540
+    },
+    {
+      "path": "payload/ext/JAPANESE/8_Text.json",
+      "sha256": "5D4A0B46EE75AE62F73DD46B6148A59CFFB8FA366EBADB998FB504F924D3046A",
+      "size": 8412
+    },
+    {
+      "path": "payload/ext/JAPANESE/9_Text.json",
+      "sha256": "990BA7B32384212CEC1613756204845F6A6C69A3ED7C054CA5C8D7432154AF3F",
+      "size": 6868
+    },
+    {
+      "path": "payload/ext/JAPANESE/m_Text.json",
+      "sha256": "99BFD0A06D167BCC6860708AA5E877D45FCE6BB2BAE5B02B5BC0D98095ADEBC1",
+      "size": 251171
+    },
+    {
+      "path": "payload/patch-font.csx",
+      "sha256": "38935B89E5562B8D4B631574542CF305CE0D58249052F1D4E12632CE7960DA18",
+      "size": 21397
+    },
+    {
+      "path": "README.txt",
+      "sha256": "73C8787E959C4A955C6C0B673A66DD79B86453242AF1562A6CD321F59BC80C48",
+      "size": 1772
+    },
+    {
+      "path": "release-config.json",
+      "sha256": "C83FC06BA920B719A7BE257F6D6567BC03CF9071D92AC1A943AFA5E78BB2FEAC",
+      "size": 679
+    },
+    {
+      "path": "THIRD-PARTY-NOTICES.md",
+      "sha256": "7305809ED80AB09FAF3113A3E0CE72C27FF2B578FB31147318AE91F05DFC1F0F",
+      "size": 1325
+    },
+    {
+      "path": "Uninstall-UFO50-CHS.cmd",
+      "sha256": "05D31B3C27F999C795D9B3C4C8BA338EBF94075A5B81B8118F1E63E520C13E65",
+      "size": 360
+    }
+  ]
+}

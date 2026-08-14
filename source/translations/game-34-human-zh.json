@@ -1,0 +1,18 @@
+{
+  "pre_gold_record": "最佳：*******",
+  "post_gold_record": "最佳：*******",
+  "gold_goal": "通关游戏",
+  "cherry_goal": "通关第二周目",
+  "garden_goal": "吃掉 ** 个三明治",
+  "detail_1": "单局最多击败敌人",
+  "detail_2": "单局最多吃下三明治",
+  "get_ready": "准备！",
+  "game_over": "游戏结束",
+  "congratulations": "恭喜！",
+  "results": "结果",
+  "final_results": "最终结果",
+  "player_x": "玩家 *",
+  "press_x": "按 *",
+  "help_me_out": "帮帮我",
+  "gather_ghosts": "收集幽灵"
+}

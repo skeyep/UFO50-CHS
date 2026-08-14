@@ -1,0 +1,17 @@
+* text=auto
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.md text eol=lf
+*.json text eol=lf
+*.mjs text eol=lf
+*.csx text eol=lf
+
+# Files covered by payload-manifest.json must keep their exact release bytes.
+/Install-UFO50-CHS.cmd -text
+/Uninstall-UFO50-CHS.cmd -text
+/README.txt -text
+/THIRD-PARTY-NOTICES.md -text
+/release-config.json -text
+/payload-manifest.json -text
+/installer/** -text
+/payload/** -text

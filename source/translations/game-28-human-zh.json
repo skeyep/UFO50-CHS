@@ -1,0 +1,20 @@
+{
+  "gold_goal": "在锦标赛中夺冠",
+  "cherry_goal": "在全部 8 场比赛中获得第一",
+  "garden_goal": "至少在 1 场比赛中获得第一",
+  "pre_gold_record": "高分：**",
+  "post_gold_record": "高分：**",
+  "detail_1": "P1 平均圈速（秒）",
+  "detail_2": "P1 平均赛时（秒）",
+  "detail_3": "P2 平均圈速（秒）",
+  "detail_4": "P2 平均赛时（秒）",
+  "select_racer": "选择车手",
+  "race_x_of_8": "比赛 **/08",
+  "race_x": "比赛 *",
+  "ranking": "排名",
+  "final_result": "最终结果",
+  "congratulations": "恭喜！！",
+  "you_are_the_champion": "你就是大钟杯竞速的冠军。",
+  "see_you_next_time": "下次再见！",
+  "most_celebrated_racer": "你已成为全宇宙最受欢迎的车手！"
+}

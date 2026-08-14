@@ -1,0 +1,27 @@
+# Local game and proprietary data
+baseline/
+private/
+ext/ENGLISH/
+reference/
+**/data.win
+**/ufo50.exe
+*.win
+*.ttf
+*.otf
+
+# Downloaded tools, decompilation and tests
+tools/
+**/utmt/
+**/all-code/
+verify-*/
+release-*-test*/
+chs-backup/
+
+# Generated releases and editor noise
+dist/
+*.log
+*.tmp
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini

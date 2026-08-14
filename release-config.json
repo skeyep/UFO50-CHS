@@ -1,0 +1,15 @@
+{
+  "version": "0.1.0",
+  "supportedDataWinSha256": "8C8FB143FAEDC8AB1F14D4AB288A4B2CD1F9A286E43DE1B5E83ED8EDE8266B29",
+  "patchedDataWinSha256": "76439B76880557808C54976663311CF4A4DD3A31D2986305D8943C8FC53AF1AB",
+  "zpix": {
+    "version": "v3.1.11",
+    "url": "https://github.com/SolidZORO/zpix-pixel-font/releases/download/v3.1.11/zpix.ttf",
+    "sha256": "ED39F02845E8C0B8CDBA275432250FB03E8528826F058BC151753BD62B44B744"
+  },
+  "utmt": {
+    "version": "0.9.1.2",
+    "url": "https://github.com/UnderminersTeam/UndertaleModTool/releases/download/0.9.1.2/UTMT_CLI_v0.9.1.2-Windows.zip",
+    "sha256": "E17637750C9C5BD074E799DE99E69E1AA58C19CBBD9CBAA8868BBC387DA04345"
+  }
+}

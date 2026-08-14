@@ -1,0 +1,22 @@
+{
+  "pre_gold_record": "关卡 ***",
+  "post_gold_record": "高分：*******",
+  "gold_goal": "通关全部 4 个世界",
+  "cherry_goal": "以 ****** 分获胜",
+  "garden_goal": "通关田径世界",
+  "detail_1": "单局最多吃下甜点",
+  "char_select_1": "选择",
+  "char_select_2": "你的",
+  "char_select_3": "角色",
+  "world_1": "球拍世界",
+  "world_2": "田径世界",
+  "world_3": "冰上世界",
+  "world_4": "美式运动世界",
+  "overtime": "加时赛！",
+  "time_bonus": "时间奖励：",
+  "game_over": "游戏结束",
+  "end_1": "嘿！别再争了！",
+  "end_2": "大家一起享受所有运动吧……",
+  "end_3": "好吧！对不起……我们以后不再争了。",
+  "the_end": "终"
+}

@@ -1,0 +1,37 @@
+name: 安装或显示问题
+description: 报告安装、启动、字体、排版或界面显示问题
+title: "[问题] "
+labels: ["bug"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: 汉化版本
+      placeholder: v0.1.0
+    validations:
+      required: true
+  - type: input
+    id: location
+    attributes:
+      label: 游戏与位置
+      placeholder: 例如：BARBUTA 暂停菜单 / 合集选档页
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤
+      placeholder: 请按顺序说明如何稳定看到问题
+    validations:
+      required: true
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: 截图或错误信息
+      description: 请勿上传 data.win、游戏 EXE 或完整游戏资源。
