@@ -11,7 +11,7 @@ jobs:
   validate:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Validate public source and payload
         shell: powershell
         run: .\scripts\validate-repository.ps1
