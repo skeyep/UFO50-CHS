@@ -70,32 +70,6 @@ function Resolve-UFO50GamePath {
     throw 'UFO 50 was not found. Extract the package and retry, or select the directory that contains ufo50.exe.'
 }
 
-function Get-VerifiedDownload {
-    param(
-        [Parameter(Mandatory = $true)][string]$Uri,
-        [Parameter(Mandatory = $true)][string]$Destination,
-        [Parameter(Mandatory = $true)][string]$ExpectedSha256
-    )
-
-    $expected = $ExpectedSha256.ToUpperInvariant()
-    if (Test-Path -LiteralPath $Destination) {
-        if ((Get-NormalizedHash -Path $Destination) -eq $expected) { return $Destination }
-    }
-
-    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Destination) | Out-Null
-    $downloadPath = $Destination + '.download'
-    if (Test-Path -LiteralPath $downloadPath) { Remove-Item -LiteralPath $downloadPath -Force }
-    Write-Host "Downloading verified upstream file: $Uri"
-    Invoke-WebRequest -UseBasicParsing -Uri $Uri -OutFile $downloadPath
-    $actual = Get-NormalizedHash -Path $downloadPath
-    if ($actual -ne $expected) {
-        Remove-Item -LiteralPath $downloadPath -Force
-        throw "Downloaded file hash mismatch. Expected $expected, got $actual."
-    }
-    Move-Item -LiteralPath $downloadPath -Destination $Destination -Force
-    return $Destination
-}
-
 function Assert-PayloadManifest {
     param([Parameter(Mandatory = $true)][string]$PackageRoot)
 

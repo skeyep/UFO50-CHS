@@ -385,6 +385,24 @@ if (state == STATE_LANGUAGE && global.language == global.LANG_JAPANESE)
     draw_text_ce(_xview + 192, _yview + 200, "仅供学习交流，禁止商业使用", 2);
 }
 """.Replace("\r\n", "\n");
+var descriptionGenreSpacingAnchor = """
+                            draw_text(_textX, _textY - 1, descContent[i]);
+                            scrFontDefault();
+                            _textY += 8;
+""".Replace("\r\n", "\n");
+var descriptionGenreSpacingReplacement = """
+                            draw_text(_textX, _textY - 1, descContent[i]);
+                            scrFontDefault();
+                            _textY += (global.language == global.LANG_JAPANESE) ? 9 : 8;
+""".Replace("\r\n", "\n");
+var descriptionMainSpacingAnchor = """
+                            draw_text(_textX, _textY, descContent[i]);
+                            _textY += 8;
+""".Replace("\r\n", "\n");
+var descriptionMainSpacingReplacement = """
+                            draw_text(_textX, _textY, descContent[i]);
+                            _textY += (global.language == global.LANG_JAPANESE) ? 9 : 8;
+""".Replace("\r\n", "\n");
 
 var importGroup = new UndertaleModLib.Compiler.CodeImportGroup(Data);
 importGroup.AutoCreateAssets = true;
@@ -395,6 +413,8 @@ importGroup.QueueReplace("gml_GlobalScript_scrLoadLibraryText", loadLibraryText)
 importGroup.QueueReplace("gml_GlobalScript_scrLoadProfile", loadProfile);
 importGroup.QueueReplace("gml_GlobalScript_scrDrawProfile", drawProfile);
 importGroup.QueueFindReplace("gml_Object_oLibrary_Draw_0", oldInfoBar, newInfoBar, true);
+importGroup.QueueFindReplace("gml_Object_oLibrary_Draw_0", descriptionGenreSpacingAnchor, descriptionGenreSpacingReplacement, true);
+importGroup.QueueFindReplace("gml_Object_oLibrary_Draw_0", descriptionMainSpacingAnchor, descriptionMainSpacingReplacement, true);
 importGroup.QueueFindReplace("gml_Object_oLibrary_Other_24", "LINE_WIDTH = 20;", "LINE_WIDTH = (global.language == global.LANG_JAPANESE) ? 13 : 20;", true);
 importGroup.QueueFindReplace("gml_Object_oLibrary_Other_24", "string(_justTheYear) + \"ねん\" + string(_monthStr)", "string(_justTheYear) + \"年\" + string(_monthStr)", true);
 importGroup.QueueFindReplace("gml_GlobalScript_scr12_Meta", "global.mGameTitle[arg0] = \"GRIMSTONE\";", "global.mGameTitle[arg0] = scrString(\"game_name_12\");", true);
@@ -417,11 +437,67 @@ function UFO50_CHS_draw_text(arg0, arg1, arg2)
     draw_text(arg0, arg1, arg2);
 }
 ");
+importGroup.QueueReplace("gml_GlobalScript_UFO50_CHS_wrap_text", """
+function UFO50_CHS_wrap_text(arg0, arg1)
+{
+    if (arg1 <= 0)
+        return arg0;
+    var _result = "";
+    var _line = "";
+    var _noLineStart = "，。！？；：、）》】」』…";
+    var _noLineEnd = "（《【「『";
+    for (var _i = 1; _i <= string_length(arg0); _i++)
+    {
+        var _char = string_char_at(arg0, _i);
+        if (_char == global.CARRIAGE_RETURN)
+        {
+            _result += _line + global.CARRIAGE_RETURN;
+            _line = "";
+            continue;
+        }
+        if (_char == " " && _line == "")
+            continue;
+        var _candidate = _line + _char;
+        if (_line != "" && string_width(_candidate) > arg1)
+        {
+            if (_char == " ")
+            {
+                _result += _line + global.CARRIAGE_RETURN;
+                _line = "";
+            }
+            else
+            {
+                var _lastPos = string_length(_line);
+                var _lastChar = string_char_at(_line, _lastPos);
+                if ((string_pos(_char, _noLineStart) > 0 || string_pos(_lastChar, _noLineEnd) > 0) && _lastPos > 1)
+                {
+                    _line = string_delete(_line, _lastPos, 1);
+                    _result += _line + global.CARRIAGE_RETURN;
+                    _line = _lastChar + _char;
+                }
+                else
+                {
+                    _result += _line + global.CARRIAGE_RETURN;
+                    _line = _char;
+                }
+            }
+        }
+        else
+        {
+            _line = _candidate;
+        }
+    }
+    return _result + _line;
+}
+""");
 importGroup.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_text_ext", @"
 function UFO50_CHS_draw_text_ext(arg0, arg1, arg2, arg3, arg4)
 {
     if (global.language == global.LANG_JAPANESE)
+    {
         arg1 -= 1;
+        arg2 = UFO50_CHS_wrap_text(arg2, arg4);
+    }
     draw_text_ext(arg0, arg1, arg2, arg3, arg4);
 }
 ");

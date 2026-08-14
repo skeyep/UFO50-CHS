@@ -1,7 +1,6 @@
 param([string]$GamePath)
 
 . (Join-Path $PSScriptRoot 'Common.ps1')
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $packageRoot = (Resolve-Path -LiteralPath (Split-Path -Parent $PSScriptRoot)).Path
 $configPath = Join-Path $packageRoot 'release-config.json'
@@ -39,21 +38,17 @@ if (-not (Test-Path -LiteralPath $payloadJapanese) -or -not (Test-Path -LiteralP
 $payloadFiles = @(Get-ChildItem -LiteralPath $payloadJapanese -File | Sort-Object Name)
 if ($payloadFiles.Count -ne 52) { throw "Unexpected localization file count: $($payloadFiles.Count). Expected 52." }
 
-$cacheRoot = Join-Path $env:LOCALAPPDATA 'UFO50-CHS\cache'
-New-Item -ItemType Directory -Force -Path $cacheRoot | Out-Null
-$zpixPath = Join-Path $cacheRoot "zpix-$($config.zpix.version).ttf"
-$utmtZip = Join-Path $cacheRoot "UTMT-CLI-$($config.utmt.version)-Windows.zip"
-$null = Get-VerifiedDownload -Uri $config.zpix.url -Destination $zpixPath -ExpectedSha256 $config.zpix.sha256
-$null = Get-VerifiedDownload -Uri $config.utmt.url -Destination $utmtZip -ExpectedSha256 $config.utmt.sha256
-
-$utmtRoot = Join-Path $cacheRoot "UTMT-CLI-$($config.utmt.version)"
-$utmtExe = Join-Path $utmtRoot 'UndertaleModCli.exe'
-if (-not (Test-Path -LiteralPath $utmtExe)) {
-    New-Item -ItemType Directory -Force -Path $utmtRoot | Out-Null
-    Expand-Archive -LiteralPath $utmtZip -DestinationPath $utmtRoot -Force
-    $found = Get-ChildItem -LiteralPath $utmtRoot -Recurse -File -Filter 'UndertaleModCli.exe' | Select-Object -First 1
-    if ($null -eq $found) { throw 'UndertaleModCli.exe was not found after extraction.' }
-    $utmtExe = $found.FullName
+$thirdPartyRoot = Join-Path $packageRoot 'third-party'
+$zpixPath = Join-Path $thirdPartyRoot 'zpix\zpix.ttf'
+$utmtZip = Join-Path $thirdPartyRoot ("UndertaleModTool\UTMT_CLI_v$($config.utmt.version)-Windows.zip")
+if (-not (Test-Path -LiteralPath $zpixPath) -or -not (Test-Path -LiteralPath $utmtZip)) {
+    throw 'The offline package is missing Zpix or UndertaleModTool CLI.'
+}
+if ((Get-NormalizedHash -Path $zpixPath) -ne ([string]$config.zpix.sha256).ToUpperInvariant()) {
+    throw 'Bundled Zpix failed integrity verification.'
+}
+if ((Get-NormalizedHash -Path $utmtZip) -ne ([string]$config.utmt.sha256).ToUpperInvariant()) {
+    throw 'Bundled UndertaleModTool CLI failed integrity verification.'
 }
 
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
@@ -89,6 +84,12 @@ $installationStarted = $false
 $previousFontSize = $env:UFO50_CHS_FONT_SIZE_PX
 try {
     New-Item -ItemType Directory -Force -Path $tempRoot | Out-Null
+    $utmtRoot = Join-Path $tempRoot 'UndertaleModTool'
+    New-Item -ItemType Directory -Force -Path $utmtRoot | Out-Null
+    Expand-Archive -LiteralPath $utmtZip -DestinationPath $utmtRoot -Force
+    $found = Get-ChildItem -LiteralPath $utmtRoot -Recurse -File -Filter 'UndertaleModCli.exe' | Select-Object -First 1
+    if ($null -eq $found) { throw 'UndertaleModCli.exe was not found in the bundled archive.' }
+    $utmtExe = $found.FullName
     $env:UFO50_CHS_FONT_SIZE_PX = '8'
     Write-Host 'Building the localized data.win. This may take a moment...'
     & $utmtExe load $dataWin -s $patchScript -o $patchedData

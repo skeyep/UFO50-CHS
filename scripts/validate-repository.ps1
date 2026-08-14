@@ -5,6 +5,7 @@ $root = (Resolve-Path -LiteralPath (Split-Path -Parent $PSScriptRoot)).Path
 $required = @(
     'Install-UFO50-CHS.cmd', 'Uninstall-UFO50-CHS.cmd', 'README.md', 'README.txt',
     'THIRD-PARTY-NOTICES.md', 'release-config.json', 'payload-manifest.json',
+    'docs\third-party\ZPIX-README.md', 'docs\third-party\UTMT-GPL-3.0.txt',
     'installer\Common.ps1', 'installer\Install-UFO50-CHS.ps1', 'installer\Uninstall-UFO50-CHS.ps1',
     'payload\patch-font.csx'
 )
