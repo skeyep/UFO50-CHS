@@ -94,8 +94,8 @@ Release 不包含 `data.win`、游戏 EXE、原始英日文本或反编译工程
 │  ├─ patch-font.csx            # GameMaker / data.win 绘制层补丁
 │  └─ ext/JAPANESE/             # 52 个可安装中文文本
 ├─ source/
-│  ├─ builders/                 # 文本构建、审计和人工认可策略
-│  └─ translations/             # 按稳定键名维护的人工译文
+│  ├─ builders/                 # 文本构建、审计和自校认可策略
+│  └─ translations/             # 按稳定键名维护的自校译文
 ├─ scripts/                     # 仓库校验、私有基线构建和 Release 打包
 └─ docs/                        # 技术结构、工作流与第三方许可
 ```
@@ -117,7 +117,7 @@ Release 不包含 `data.win`、游戏 EXE、原始英日文本或反编译工程
 
 v0.1.0 只是首次跑通完整流程的测试版。遇到漏译、语境、字体、排版或安装问题，请直接提交 Issue；请附上游戏名、出现位置、截图和复现步骤。
 
-贡献前请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。翻译修改必须由贡献者理解原文后人工完成，禁止提交未经人工核对的机器翻译批量稿。
+贡献前请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。翻译修改必须由贡献者理解原文后人工完成。
 
 ## 字体与第三方项目
 
