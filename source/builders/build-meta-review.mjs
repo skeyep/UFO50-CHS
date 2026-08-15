@@ -19,7 +19,7 @@ const legacy = JSON.parse(fs.readFileSync(legacyPath, "utf8"));
 const human = JSON.parse(fs.readFileSync(humanPath, "utf8"));
 const keys = Object.keys(legacy);
 for (const key of Object.keys(human)) {
-  if (!keys.includes(key)) throw new Error(`人工元数据包含未知键：${key}`);
+  if (!(key in variants)) throw new Error(`人工元数据包含未知键：${key}`);
 }
 
 function category(key) {

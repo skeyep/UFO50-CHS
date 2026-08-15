@@ -21,7 +21,7 @@ foreach ($name in @('0_Text.json', 'm_Text.json')) {
 }
 
 $forbidden = @(Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object {
-    $_.FullName -notmatch '(?i)(\\|/)\.git(\\|/)' -and (
+    $_.FullName -notmatch '(?i)(\\|/)(?:\.git|dist)(\\|/)' -and (
         $_.Extension -in @('.win', '.ttf', '.otf', '.exe') -or
         $_.FullName -match '(?i)(\\|/)(ENGLISH|reference|all-code|private)(\\|/)'
     )
@@ -39,7 +39,7 @@ foreach ($file in Get-ChildItem -LiteralPath (Join-Path $root 'source\translatio
     $null = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
 }
 $config = Get-Content -LiteralPath (Join-Path $root 'release-config.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-if ([string]$config.version -ne '0.1.0') { throw 'Unexpected release version.' }
+if ([string]$config.version -ne '0.1.1') { throw 'Unexpected release version.' }
 
 $manifest = Get-Content -LiteralPath (Join-Path $root 'payload-manifest.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 foreach ($entry in $manifest.files) {
@@ -53,6 +53,7 @@ foreach ($entry in $manifest.files) {
 
 $privatePatterns = '(?i)C:\\Users\\|D:\\SteamLibrary\\|skeyep@qq\.com'
 foreach ($file in Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object { $_.Extension -in @('.md','.txt','.ps1','.cmd','.json','.mjs','.csx','.yml') }) {
+    if ($file.FullName -match '(?i)(\\|/)(?:\.git|dist)(\\|/)') { continue }
     if (Select-String -LiteralPath $file.FullName -Pattern $privatePatterns -Quiet) {
         throw "Local path or private identifier found in public file: $($file.FullName)"
     }
