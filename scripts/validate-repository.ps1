@@ -39,7 +39,7 @@ foreach ($file in Get-ChildItem -LiteralPath (Join-Path $root 'source\translatio
     $null = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
 }
 $config = Get-Content -LiteralPath (Join-Path $root 'release-config.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-if ([string]$config.version -ne '0.1.1') { throw 'Unexpected release version.' }
+if ([string]$config.version -ne '0.1.2') { throw 'Unexpected release version.' }
 
 $manifest = Get-Content -LiteralPath (Join-Path $root 'payload-manifest.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 foreach ($entry in $manifest.files) {

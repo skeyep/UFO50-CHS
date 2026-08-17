@@ -1,6 +1,6 @@
 # UFO 50 简体中文汉化
 
-Windows Steam 版《UFO 50》简体中文民间汉化。当前版本为 **v0.1.1 测试版**，已经跑通完整的翻译、字体适配、安装、备份和卸载流程，但仍可能存在语境、排版或漏译问题。
+Windows Steam 版《UFO 50》简体中文民间汉化。当前版本为 **v0.1.2 测试版**，已经跑通完整的翻译、字体适配、安装、备份和卸载流程，但仍可能存在语境、排版或漏译问题。
 
 汉化补丁：**Skeyep_目目**
 
@@ -19,7 +19,7 @@ Windows Steam 版《UFO 50》简体中文民间汉化。当前版本为 **v0.1.1
 
 ### 下载与安装
 
-1. 前往 [Releases](https://github.com/skeyep/UFO50-CHS/releases) 下载 `UFO50-CHS-v0.1.1-test.zip`。
+1. 前往 [Releases](https://github.com/skeyep/UFO50-CHS/releases) 下载 `UFO50-CHS-v0.1.2-test.zip`。
 2. **完整解压** ZIP，不要直接在压缩包内运行。
 3. 关闭《UFO 50》。
 4. 双击 `Install-UFO50-CHS.cmd`。
@@ -121,9 +121,9 @@ Release 不包含 `data.win`、游戏 EXE、原始英日文本、反编译工程
 
 ## 参与维护
 
-v0.1.1 仍是持续维护中的测试版。遇到漏译、语境、字体、排版或安装问题，请直接提交 Issue；请附上游戏名、出现位置、截图和复现步骤。
+v0.1.2 仍是持续维护中的测试版。遇到漏译、语境、字体、排版或安装问题，请直接提交 Issue；请附上游戏名、出现位置、截图和复现步骤。
 
-贡献前请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。翻译修改必须由贡献者理解原文后人工完成。
+贡献前请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。翻译修改必须由贡献者理解原文后完成。
 
 ## 字体与第三方项目
 

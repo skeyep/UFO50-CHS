@@ -1138,6 +1138,64 @@ libraryLayoutGroup.QueueRegexFindReplace(
 );
 libraryLayoutGroup.Import();
 
+// Several games split text into arrays and then draw each row manually. Those
+// call sites bypass draw_text_ext(), so the general CHS line-step correction
+// cannot reach them. PARTY HOUSE is the most visible case: its 80px sidebar
+// used a 64px wrapping width and advanced Zpix rows by only 8px. Use the real
+// safe width (72px, leaving an 8px right margin) and the measured CHS height.
+var partyHouseDrawCode = Data.Code.ByName("gml_Object_o36_Game_Draw_0");
+if (partyHouseDrawCode == null)
+    throw new System.Exception("Missing PARTY HOUSE draw code.");
+var partyHouseLayoutGroup = new UndertaleModLib.Compiler.CodeImportGroup(Data);
+partyHouseLayoutGroup.ThrowOnNoOpFindReplace = true;
+partyHouseLayoutGroup.QueueRegexFindReplace(
+    partyHouseDrawCode,
+    @"var lineY\s*=\s*INFO_Y\s*\+\s*8;",
+    "var lineY = INFO_Y + 8;\n        var _infoLineStep = (global.language == global.LANG_JAPANESE) ? max(8, ceil(string_height(\"中\"))) : LINE_SPACE;\n        var _infoWrapChars = (global.language == global.LANG_JAPANESE) ? 9 : 8;",
+    true
+);
+partyHouseLayoutGroup.QueueRegexFindReplace(
+    partyHouseDrawCode,
+    @"scrStringSplit\(([^\r\n]*?),\s*8,\s*0\)",
+    "scrStringSplit($1, _infoWrapChars, 0)",
+    true
+);
+partyHouseLayoutGroup.QueueFindReplace(
+    partyHouseDrawCode,
+    "string_line_breaks(scrStringVal(\"prestige_1\", PRESTIGE_GOAL), 8, 0)",
+    "string_line_breaks(scrStringVal(\"prestige_1\", PRESTIGE_GOAL), _infoWrapChars, 0)",
+    true
+);
+partyHouseLayoutGroup.QueueRegexFindReplace(
+    partyHouseDrawCode,
+    @"lineY\s*\+=\s*LINE_SPACE;",
+    "lineY += _infoLineStep;",
+    true
+);
+partyHouseLayoutGroup.Import();
+
+// Apply the same measured row step to the remaining explicit split-and-draw
+// loops that still hard-code 8px. Other languages keep their original layout.
+var manualLineStepTargets = new[]
+{
+    new { Code = "gml_Object_o05_Game_Draw_0", Old = "96 + (8 * i)", New = "96 + (((global.language == global.LANG_JAPANESE) ? max(8, ceil(string_height(\"中\"))) : 8) * i)" },
+    new { Code = "gml_GlobalScript_scr07_DrawModUI", Old = "(64 * i) + (8 * j)", New = "(64 * i) + (((global.language == global.LANG_JAPANESE) ? max(8, ceil(string_height(\"中\"))) : 8) * j)" },
+    new { Code = "gml_Object_o38_Mas_Draw_0", Old = "var _y = yText + (8 * k);\n            if (_y > (_yview + 208))", New = "var _cutLineStep = (global.language == global.LANG_JAPANESE) ? max(8, ceil(string_height(\"中\"))) : 8;\n            var _y = yText + (_cutLineStep * k);\n            if ((_y + _cutLineStep) > (_yview + 216))" },
+    new { Code = "gml_Object_o40_HammerMan_Draw_0", Old = "yy + 8 + (8 * i)", New = "yy + 8 + (((global.language == global.LANG_JAPANESE) ? max(8, ceil(string_height(\"中\"))) : 8) * i)" },
+    new { Code = "gml_Object_o40_RodMan_Draw_0", Old = "yy + 8 + (8 * i)", New = "yy + 8 + (((global.language == global.LANG_JAPANESE) ? max(8, ceil(string_height(\"中\"))) : 8) * i)" },
+    new { Code = "gml_Object_o40_Shop_Draw_0", Old = "draw_text(xx + 8, yy + 16, str[1]);", New = "draw_text(xx + 8, yy + 8 + ((global.language == global.LANG_JAPANESE) ? max(8, ceil(string_height(\"中\"))) : 8), str[1]);" }
+};
+foreach (var target in manualLineStepTargets)
+{
+    var targetCode = Data.Code.ByName(target.Code);
+    if (targetCode == null)
+        throw new System.Exception($"Missing manual line-step target: {target.Code}");
+    var targetGroup = new UndertaleModLib.Compiler.CodeImportGroup(Data);
+    targetGroup.ThrowOnNoOpFindReplace = true;
+    targetGroup.QueueFindReplace(targetCode, target.Old, target.New, true);
+    targetGroup.Import();
+}
+
 // AVIANOS 把 ASCII 字符映射为资源、兵种、建筑和状态图标；中文槽不能把这些
 // 字符一并路由到 Zpix。该游戏的普通绘制改为逐字符混排：ASCII 保留原图标字体，
 // 中文使用 Zpix。draw_text_bg 的尾部已在上方单独接入同一混排函数。

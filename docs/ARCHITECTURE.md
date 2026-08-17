@@ -4,9 +4,11 @@
 
 UFO 50 的外置文本按语言和内部游戏 ID 分目录保存。补丁复用原日语槽作为中文槽：`0_Text.json` 负责合集通用界面，`m_Text.json` 负责合集资料，`1_Text.json` 至 `50_Text.json` 负责各子游戏。
 
-除元数据外，外置文件通常是 Base64 包装的 UTF-8 JSON。构建器保留原键名、布局字段、尾逗号和控制符，只替换经过人工认可的文本值。
+除元数据外，外置文件通常是 Base64 包装的 UTF-8 JSON。构建器保留原键名、布局字段、尾逗号和控制符，只替换经过审核认可的文本值。
 
 ## GameMaker 绘制补丁
+
+除 `draw_text_ext()` 外，部分子游戏会先用 `scrStringSplit()` 或 `string_line_breaks()` 得到行数组，再逐行调用 `draw_text()`。这类界面必须在调用点按 Zpix 实际字高推进纵坐标，并结合真实文本框宽度和底部边界复核，不能依赖通用包装函数自动修正。
 
 `payload/patch-font.csx` 由 UndertaleModTool 在用户本机应用到用户自己的原版 `data.win`，主要负责：
 
