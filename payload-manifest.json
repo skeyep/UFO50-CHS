@@ -1,6 +1,6 @@
 {
   "version": "0.1.2",
-  "generatedAt": "2026-08-17T13:25:18.6415482Z",
+  "generatedAt": "2026-08-22T07:24:20.9291723Z",
   "files": [
     {
       "path": "Install-UFO50-CHS.cmd",
@@ -279,8 +279,8 @@
     },
     {
       "path": "payload/ext/JAPANESE/m_Text.json",
-      "sha256": "CB790B2A3C5560B5673924D06D7A137D8C9661510E0779E28014B75037EB045D",
-      "size": 251186
+      "sha256": "1634B57A329C90BA5DFA3EDB40F2DAEAD1AFF634B395816964E868420FF8E20D",
+      "size": 251348
     },
     {
       "path": "payload/patch-font.csx",
