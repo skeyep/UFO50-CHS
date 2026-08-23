@@ -7,7 +7,7 @@ body:
     id: version
     attributes:
       label: 汉化版本
-      placeholder: v0.1.0
+      placeholder: v0.2.0
     validations:
       required: true
   - type: input

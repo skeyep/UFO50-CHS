@@ -4,6 +4,7 @@ import path from "node:path";
 const root = path.resolve(import.meta.dirname, "..");
 const gmlPath = path.join(root, "chs-tools", "all-code", "CodeEntries", "gml_GlobalScript_scrLoadInternalText.gml");
 const humanPath = path.join(root, "chs-tools", "translations", "meta-human-zh.json");
+const game51Path = path.join(root, "chs-tools", "translations", "game-51-human-zh.json");
 const outputPath = path.join(root, "chs-tools", "staging", "JAPANESE", "m_Text.json");
 
 const lines = fs.readFileSync(gmlPath, "utf8").split(/\r?\n/).slice(0, 5923);
@@ -16,15 +17,17 @@ for (const line of lines) {
 }
 
 const human = JSON.parse(fs.readFileSync(humanPath, "utf8"));
+const game51 = JSON.parse(fs.readFileSync(game51Path, "utf8"));
+const approved = { ...human, ...game51 };
 const output = JSON.parse(fs.readFileSync(outputPath, "utf8"));
 const englishKeys = Object.keys(english);
 const outputKeys = Object.keys(output);
-const unknownHuman = Object.keys(human).filter(key => !(key in english));
+const unknownHuman = Object.keys(approved).filter(key => !(key in english));
 const missing = englishKeys.filter(key => !(key in output));
 const extra = outputKeys.filter(key => !(key in english));
-const nonHumanDiff = englishKeys.filter(key => !(key in human) && output[key] !== english[key]);
+const nonHumanDiff = englishKeys.filter(key => !(key in approved) && output[key] !== english[key]);
 const layoutDiff = englishKeys.filter(key => /_(?:lim|wl|wc)$/.test(key) && output[key] !== english[key]);
-const missingHuman = Object.keys(human).filter(key => output[key] !== human[key]);
+const missingHuman = Object.keys(approved).filter(key => output[key] !== approved[key]);
 
 const failures = { unknownHuman, missing, extra, nonHumanDiff, layoutDiff, missingHuman };
 for (const [name, values] of Object.entries(failures)) {
@@ -41,7 +44,8 @@ const categories = {
 console.log(JSON.stringify({
   englishKeys: englishKeys.length,
   outputKeys: outputKeys.length,
-  humanApproved: Object.keys(human).length,
+  humanApproved: Object.keys(approved).length,
+  game51Approved: Object.keys(game51).length,
   categories,
   nonHumanDiff: nonHumanDiff.length,
   layoutDiff: layoutDiff.length,

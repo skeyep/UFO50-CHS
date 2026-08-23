@@ -5,6 +5,7 @@ const root = path.resolve(import.meta.dirname, "..");
 const gmlPath = path.join(root, "chs-tools", "all-code", "CodeEntries", "gml_GlobalScript_scrLoadInternalText.gml");
 // 旧 meta-zh-cache.json 含机器初稿，只保留作历史参考，禁止写入活动构建。
 const cachePath = path.join(root, "chs-tools", "translations", "meta-human-zh.json");
+const game51Path = path.join(root, "chs-tools", "translations", "game-51-human-zh.json");
 const outputPath = path.join(root, "chs-tools", "staging", "JAPANESE", "m_Text.json");
 
 const lines = fs.readFileSync(gmlPath, "utf8").split(/\r?\n/).slice(0, 5923);
@@ -23,10 +24,11 @@ if (Object.keys(meta).length < 2500) {
 }
 
 const cache = fs.existsSync(cachePath) ? JSON.parse(fs.readFileSync(cachePath, "utf8")) : {};
-for (const [key, value] of Object.entries(cache)) {
+const game51 = fs.existsSync(game51Path) ? JSON.parse(fs.readFileSync(game51Path, "utf8")) : {};
+for (const [key, value] of Object.entries({ ...cache, ...game51 })) {
   if (key in meta) meta[key] = value;
 }
 
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 fs.writeFileSync(outputPath, `${JSON.stringify(meta, null, 2)}\r\n`, "utf8");
-console.log(`已生成 ${Object.keys(meta).length} 条外置元数据，其中中文缓存 ${Object.keys(cache).length} 条：${outputPath}`);
+console.log(`已生成 ${Object.keys(meta).length} 条外置元数据，其中合集中文 ${Object.keys(cache).length} 条、第 51 款中文 ${Object.keys(game51).length} 条：${outputPath}`);

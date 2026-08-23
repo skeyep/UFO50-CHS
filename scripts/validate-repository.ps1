@@ -7,7 +7,9 @@ $required = @(
     'THIRD-PARTY-NOTICES.md', 'release-config.json', 'payload-manifest.json',
     'docs\third-party\ZPIX-README.md', 'docs\third-party\UTMT-GPL-3.0.txt',
     'installer\Common.ps1', 'installer\Install-UFO50-CHS.ps1', 'installer\Uninstall-UFO50-CHS.ps1',
-    'payload\patch-font.csx'
+    'payload\patch-font.csx',
+    'source\builders\audit-game51.mjs', 'source\builders\audit-layout.py',
+    'source\builders\build-game51-review.mjs', 'source\translations\game-51-human-zh.json'
 )
 foreach ($relative in $required) {
     if (-not (Test-Path -LiteralPath (Join-Path $root $relative))) { throw "Missing required file: $relative" }
@@ -38,8 +40,23 @@ foreach ($file in Get-ChildItem -LiteralPath $root -Recurse -File -Filter '*.ps1
 foreach ($file in Get-ChildItem -LiteralPath (Join-Path $root 'source\translations') -File -Filter '*.json') {
     $null = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
 }
+$translationSources = @(Get-ChildItem -LiteralPath (Join-Path $root 'source\translations') -File -Filter '*.json')
+if ($translationSources.Count -ne 53) { throw "Expected 53 translation sources, found $($translationSources.Count)." }
+$game51Source = Get-Content -LiteralPath (Join-Path $root 'source\translations\game-51-human-zh.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+if (@($game51Source.PSObject.Properties).Count -ne 547) { throw 'Unexpected game 51 translation count.' }
+$metaPayload = Get-Content -LiteralPath (Join-Path $payloadRoot 'm_Text.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$game51PayloadCount = @($metaPayload.PSObject.Properties | Where-Object Name -like 'game_51_*').Count
+if ($game51PayloadCount -ne 1601) { throw "Unexpected game 51 payload count: $game51PayloadCount." }
+foreach ($protocol in @{
+    game_internal_name_51 = 'MIAS'; game_cheat_51_0 = 'GREGMILK'; game_cheat_51_1 = 'EXECMIAS';
+    game_cheat_51_2 = 'HIDEHOLE'; game_cheat_51_3 = 'SOAPSTOP'; game_cheat_51_4 = '19880229'
+}.GetEnumerator()) {
+    if ([string]$metaPayload.($protocol.Key) -ne [string]$protocol.Value) {
+        throw "Game 51 protocol mismatch: $($protocol.Key)"
+    }
+}
 $config = Get-Content -LiteralPath (Join-Path $root 'release-config.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-if ([string]$config.version -ne '0.1.2') { throw 'Unexpected release version.' }
+if ([string]$config.version -ne '0.2.0') { throw 'Unexpected release version.' }
 
 $manifest = Get-Content -LiteralPath (Join-Path $root 'payload-manifest.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 foreach ($entry in $manifest.files) {
@@ -59,4 +76,4 @@ foreach ($file in Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object
     }
 }
 
-Write-Host "Repository validation passed: $($payload.Count) payload files, $(@(Get-ChildItem (Join-Path $root 'source\translations') -File).Count) translation sources."
+Write-Host "Repository validation passed: $($payload.Count) payload files, $($translationSources.Count) translation sources."
