@@ -1,6 +1,6 @@
 {
     "version":  "0.2.0",
-    "generatedAt":  "2026-08-23T17:42:21.2567206Z",
+    "generatedAt":  "2026-08-23T17:49:13.3097081Z",
     "files":  [
                   {
                       "path":  "installer/Common.ps1",
@@ -289,8 +289,8 @@
                   },
                   {
                       "path":  "README.txt",
-                      "sha256":  "72FCD0CE70FC34DACE1961FF9653954F2F631CACE3889ACBD13271D34A2F6609",
-                      "size":  2747
+                      "sha256":  "2303A5F17074D10DDFD0D6303AB8A524F99617359861B07CA7BF4664B2DAA5D6",
+                      "size":  2694
                   },
                   {
                       "path":  "release-config.json",

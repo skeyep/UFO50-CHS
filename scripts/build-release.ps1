@@ -45,7 +45,7 @@ $utmtSource = Get-ReleaseDependency -Uri $config.utmt.sourceUrl -Destination (Jo
 
 $dist = Join-Path $root 'dist'
 $stage = Join-Path $dist ("stage-" + [guid]::NewGuid().ToString('N'))
-$name = "UFO50-CHS-v$Version-test"
+$name = "UFO50-CHS-v$Version"
 $package = Join-Path $stage $name
 $zip = Join-Path $dist ($name + '.zip')
 New-Item -ItemType Directory -Force -Path $package | Out-Null
