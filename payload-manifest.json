@@ -279,8 +279,8 @@
                   },
                   {
                       "path":  "payload/ext/JAPANESE/m_Text.json",
-                      "sha256":  "45475390C785EFB9B49A2EC93B22AA14FB0AC3CF84F71EDA17525DB00642B881",
-                      "size":  248626
+                      "sha256":  "BB1F9007AEC3E268753326ABB123CAAE9C3ADCD7C313AAD579BC09238B9E13C7",
+                      "size":  248623
                   },
                   {
                       "path":  "payload/patch-font.csx",
