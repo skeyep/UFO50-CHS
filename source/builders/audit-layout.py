@@ -163,23 +163,29 @@ def append_layout_rows(
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument("--font", type=Path)
     parser.add_argument("--font-size", type=int, default=8)
     parser.add_argument("--dpi", type=int, default=96)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--reference-root", type=Path)
+    parser.add_argument("--text-root", type=Path)
+    parser.add_argument("--meta-gml", type=Path)
     args = parser.parse_args()
 
     root = args.root.resolve()
+    reference_root = (args.reference_root or root / "private").resolve()
     font_path = (
-        args.font or root / "font-candidates" / "fonts" / "zpix-original-personal-only.ttf"
+        args.font or reference_root / "font-candidates" / "fonts" / "zpix-original-personal-only.ttf"
     ).resolve()
-    output = (args.output or root / "chs-review" / "layout-audit.tsv").resolve()
+    output = (args.output or root / "dist" / "review" / "layout-audit.tsv").resolve()
     measure = FontMeasure(font_path, args.font_size, args.dpi)
 
-    english_dir = root / "ext" / "ENGLISH"
-    japanese_dir = root / "reference" / "JAPANESE-original"
-    chinese_dir = root / "chs-tools" / "staging" / "JAPANESE"
+    english_dir = reference_root / "ext" / "ENGLISH"
+    japanese_dir = reference_root / "reference" / "JAPANESE-original"
+    chinese_dir = (args.text_root or root / "dist" / "text" / "JAPANESE").resolve()
+    if len(list(english_dir.glob("*_Text.json"))) != 51:
+        raise ValueError("英文参考不完整：需要 ID 0—50 的 51 份文本。")
     rows: list[dict[str, object]] = []
 
     for english_path in sorted(english_dir.glob("*_Text.json"), key=lambda item: int(item.stem.split("_")[0])):
@@ -187,16 +193,30 @@ def main() -> int:
         japanese_path = japanese_dir / english_path.name
         chinese_path = chinese_dir / english_path.name
         if not japanese_path.exists() or not chinese_path.exists():
-            continue
+            raise FileNotFoundError(f"缺少日文参考或中文载荷：{english_path.name}")
         english = decode_official_json(english_path)
         japanese = decode_official_json(japanese_path)
         chinese = decode_official_json(chinese_path)
         append_layout_rows(rows, game_id, english, japanese, chinese, measure)
 
-    meta_gml = root / "chs-tools" / "all-code" / "CodeEntries" / "gml_GlobalScript_scrLoadInternalText.gml"
+    meta_gml = args.meta_gml or reference_root / "chs-tools" / "all-code" / "CodeEntries" / "gml_GlobalScript_scrLoadInternalText.gml"
     meta_lines = meta_gml.read_text(encoding="utf-8").splitlines()
-    english_meta = extract_meta(meta_lines[2:5923])
-    japanese_meta = extract_meta(meta_lines[35528:])
+    def language_meta(language: str) -> dict[str, str]:
+        selected: list[str] = []
+        active = False
+        for line in meta_lines:
+            branch = re.match(r"\s*if\s*\(global\.language\s*==\s*global\.LANG_([A-Z_]+)\)", line)
+            if branch:
+                active = branch.group(1) == language
+            if active:
+                selected.append(line)
+        result = extract_meta(selected)
+        if len(result) < 2500:
+            raise ValueError(f"元数据语言分支不完整：{language}")
+        return result
+
+    english_meta = language_meta("ENGLISH")
+    japanese_meta = language_meta("JAPANESE")
     chinese_meta = json.loads((chinese_dir / "m_Text.json").read_text(encoding="utf-8"))
     append_layout_rows(rows, 51, english_meta, japanese_meta, chinese_meta, measure, "game_51_")
 
@@ -223,4 +243,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

@@ -1,13 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
+import { project, positionalArgs } from "./project-paths.mjs";
 
-const id = process.argv[2];
-if (!/^\d+$/.test(id ?? "")) throw new Error("用法：node chs-tools/build-game.mjs <游戏内部 ID>");
+const id = positionalArgs[0];
+if (!/^\d+$/.test(id ?? "")) throw new Error("用法：node source/builders/build-game.mjs <游戏内部 ID>");
 
-const root = path.resolve(import.meta.dirname, "..");
-const sourcePath = path.join(root, "ext", "ENGLISH", `${id}_Text.json`);
-const cachePath = path.join(root, "chs-tools", "translations", `game-${id}-human-zh.json`);
-const outputPath = path.join(root, "chs-tools", "staging", "JAPANESE", `${id}_Text.json`);
+const sourcePath = path.join(project.englishDir, `${id}_Text.json`);
+const cachePath = path.join(project.translationsDir, `game-${id}-human-zh.json`);
+const outputPath = path.join(project.outputDir, `${id}_Text.json`);
 
 function decode(file) {
   const raw = Buffer.from(fs.readFileSync(file, "ascii").trim(), "base64").toString("utf8");

@@ -47,6 +47,8 @@ function scrInitFonts()
     global.fontCrackSmall = font_add_sprite_ext(sFontCrackSmall, fontMapBasic, false, 0);
     global.currFont = global.fontDefault;
     global.prePauseFont = global.fontDefault;
+    global.chsRequestedFont = global.fontDefault;
+    global.chsPrePauseRequestedFont = global.fontDefault;
 }
 """;
 
@@ -69,6 +71,7 @@ function scrSetFont(arg0)
     var _font = arg0;
     if (font_exists(_font))
     {
+        if (_font != global.fontDefault_CHS) global.chsRequestedFont = _font;
         var _spriteDigits = (_font == global.fontDigital || _font == global.fontDigitalMini || _font == global.fontDigitalBig || _font == global.fontDigital2);
         if (global.language == global.LANG_JAPANESE && font_exists(global.fontDefault_CHS) && !_spriteDigits)
         {
@@ -856,7 +859,7 @@ var drawTextCeReplacement = """
 function draw_text_ce(arg0, arg1, arg2, arg3)
 {
     var str;
-    var _useActualWidth = global.language == global.LANG_JAPANESE && global.currFont == global.fontDefault_CHS;
+    var _useActualWidth = global.language == global.LANG_JAPANESE && global.currFont == global.fontDefault_CHS && UFO50_CHS_number_font(arg2) < 0;
     if (arg3 && !_useActualWidth)
     {
         str = string_even(arg2, arg3 - 1);
@@ -873,7 +876,7 @@ function draw_text_ce(arg0, arg1, arg2, arg3)
 var drawTextCenteredReplacement = """
 function draw_text_centered(arg0, arg1, arg2, arg3)
 {
-    var _useActualWidth = global.language == global.LANG_JAPANESE && global.currFont == global.fontDefault_CHS;
+    var _useActualWidth = global.language == global.LANG_JAPANESE && global.currFont == global.fontDefault_CHS && UFO50_CHS_number_font(arg2) < 0;
     var pixelWidth = _useActualWidth ? string_width(arg2) : string_length(arg2) * arg3;
     var startX = arg0 - floor(pixelWidth / 2);
     draw_text(startX, arg1, arg2);
@@ -884,7 +887,7 @@ function draw_text_bg_centered(arg0, arg1, arg2, arg3, arg4, arg5, arg6)
 {
     var numChars = string_length(arg2);
     var oldColor = draw_get_color();
-    var _useActualWidth = global.language == global.LANG_JAPANESE && global.currFont == global.fontDefault_CHS;
+    var _useActualWidth = global.language == global.LANG_JAPANESE && global.currFont == global.fontDefault_CHS && UFO50_CHS_number_font(arg2) < 0;
     var pixelWidth = _useActualWidth ? string_width(arg2) : numChars * arg4;
     var startX = arg0 - floor(pixelWidth / 2);
     var _charX = startX;
@@ -928,8 +931,16 @@ importGroup.QueueFindReplace("gml_GlobalScript_scr12_Meta", "global.mGameTitle[a
 importGroup.QueueFindReplace("gml_GlobalScript_scrDrawTextInput", drawTextInputHeader, drawTextInputHeaderNew, true);
 importGroup.QueueFindReplace("gml_GlobalScript_scrDrawTextInput", drawTextInputMeasure, drawTextInputMeasureNew, true);
 importGroup.QueueFindReplace("gml_GlobalScript_scrDrawTextInput", drawTextInputGlyph, drawTextInputGlyphNew, true);
-importGroup.QueueFindReplace("gml_GlobalScript_scrDrawTextCentered", "var strLen = string_length(arg0) * arg3;", "var strLen = (global.language == global.LANG_JAPANESE && global.currFont == global.fontDefault_CHS) ? string_width(arg0) : string_length(arg0) * arg3;", true);
-importGroup.QueueFindReplace("gml_GlobalScript_scrDrawTextCenteredPoint", "strLenTemp = string_length(arg0) * arg3;", "strLenTemp = (global.language == global.LANG_JAPANESE && global.currFont == global.fontDefault_CHS) ? string_width(arg0) : string_length(arg0) * arg3;", true);
+importGroup.QueueFindReplace("gml_GlobalScript_scrDrawTextCentered", "var strLen = string_length(arg0) * arg3;", "var strLen = (global.language == global.LANG_JAPANESE && global.currFont == global.fontDefault_CHS && UFO50_CHS_number_font(arg0) < 0) ? string_width(arg0) : string_length(arg0) * arg3;", true);
+importGroup.QueueFindReplace("gml_GlobalScript_scrDrawTextCenteredPoint", "strLenTemp = string_length(arg0) * arg3;", "strLenTemp = (global.language == global.LANG_JAPANESE && global.currFont == global.fontDefault_CHS && UFO50_CHS_number_font(arg0) < 0) ? string_width(arg0) : string_length(arg0) * arg3;", true);
+importGroup.QueueFindReplace("gml_GlobalScript_scrPause", "global.prePauseFont = global.currFont;", "global.prePauseFont = global.currFont;\n    global.chsPrePauseRequestedFont = global.chsRequestedFont;", true);
+importGroup.QueueFindReplace("gml_GlobalScript_scrUnpause", "scrSetFont(global.prePauseFont);", "scrSetFont(global.prePauseFont);\n    global.chsRequestedFont = global.chsPrePauseRequestedFont;", true);
+// Temporary overlays must restore the original requested font with the routed font.
+foreach (var overlay in new[] { "gml_Object_oGame_Draw_0", "gml_Object_oAchManager_Draw_0" })
+{
+    importGroup.QueueFindReplace(overlay, "var _preFont = global.currFont;", "var _preFont = global.currFont;\nvar _preRequestedFont = global.chsRequestedFont;", true);
+    importGroup.QueueFindReplace(overlay, "scrSetFont(_preFont);", "scrSetFont(_preFont);\nglobal.chsRequestedFont = _preRequestedFont;", true);
+}
 importGroup.QueueFindReplace("gml_GlobalScript_draw_text_with_sprites", textWithSpritesAdvance, textWithSpritesAdvanceNew, true);
 importGroup.QueueFindReplace("gml_Object_o35b__Game_Draw_0", "draw_set_font(global.fontTall);", "scrSetFont(global.fontTall);", true);
 importGroup.QueueFindReplace("gml_Object_o35b__Game_Draw_0", "draw_set_font(global.fontDefault);", "scrSetFont(global.fontDefault);", true);
@@ -945,14 +956,71 @@ importGroup.QueueFindReplace("gml_Object_oConfirm_Draw_0", "scrDrawTextCentered(
 importGroup.QueueFindReplace("gml_Object_o29_Game_Draw_0", "scrDrawTextCentered(string_even(scrString(\"level\") + \" \" + levelNum, 3), 0, 72, 8, 384);", "var _levelLabel = scrString(\"level\") + \" \" + levelNum;\n    scrDrawTextCentered((global.language == global.LANG_JAPANESE) ? _levelLabel : string_even(_levelLabel, 3), 0, 72, 8, 384);", true);
 importGroup.QueueFindReplace("gml_GlobalScript_scrInitDisplay", "    window_set_size(384 * global.scale, 216 * global.scale);", "    var _startupScale = min(global.scale, global.scaleFill);\n    window_set_size(384 * _startupScale, 216 * _startupScale);", true);
 importGroup.QueueFindReplace("gml_Object_oPauseMenu_Draw_0", "\nif (state == STATE_TERMINAL)\n", languageNotice + "\nif (state == STATE_TERMINAL)\n", true);
+// 纯数字串依据调用者请求的原版字体绘制。包括补零、时间、比分、货币、
+// 百分比和倍率；中文正文中的数字继续随正文排版，不在这里拆开。
+importGroup.QueueReplace("gml_GlobalScript_UFO50_CHS_number_font", """
+function UFO50_CHS_number_font(arg0)
+{
+    if (global.language != global.LANG_JAPANESE) return -1;
+    var _text = string(arg0);
+    var _hasDigit = false;
+    for (var _i = 1; _i <= string_length(_text); _i++)
+    {
+        var _char = string_char_at(_text, _i);
+        if (string_pos(_char, "0123456789") > 0) _hasDigit = true;
+        else if (string_pos(_char, " +-/:.,%$()MXPx×^") == 0) return -1;
+        else if (string_pos(_char, "+-/:.,%$()×^") > 0) _hasDigit = true;
+    }
+    if (!_hasDigit) return -1;
+    var _font = draw_get_font();
+    if (_font == global.fontDefault_CHS) _font = global.chsRequestedFont;
+    return font_exists(_font) && _font != global.fontDefault_CHS ? _font : -1;
+}
+""");
+// Fixed-width counters following translated labels keep their original digits.
+importGroup.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_labeled_number", """
+function UFO50_CHS_draw_labeled_number(arg0, arg1, arg2, arg3, arg4)
+{
+    if (global.language != global.LANG_JAPANESE)
+    {
+        draw_text(arg0, arg1, string(arg2) + string(arg3));
+        return;
+    }
+    var _font = draw_get_font();
+    var _numberFont = UFO50_CHS_number_font(arg3);
+    if (_numberFont < 0)
+    {
+        draw_text(arg0, arg1, string(arg2) + string(arg3));
+        return;
+    }
+    var _labelWidth = string_width(arg2);
+    draw_set_font(_numberFont);
+    var _numberWidth = string_width(arg3);
+    draw_set_font(_font);
+    var _align = draw_get_halign();
+    if (arg4 == fa_right) arg0 -= _labelWidth + _numberWidth;
+    else if (arg4 == fa_center) arg0 -= floor((_labelWidth + _numberWidth) / 2);
+    draw_set_halign(fa_left);
+    draw_text(arg0, arg1, arg2);
+    draw_text(arg0 + _labelWidth, arg1, arg3);
+    draw_set_halign(_align);
+}
+""");
+importGroup.QueueFindReplace("gml_Object_o17__Game_Draw_0", "hiScoreFormat = scrString(\"high_score\") + \":\" + hiScoreFormat;\ndraw_text(384 - (string_length(hiScoreFormat) * 8) - 8, 8, hiScoreFormat);", "if (global.language == global.LANG_JAPANESE)\n    UFO50_CHS_draw_labeled_number(376, 8, scrString(\"high_score\") + \":\", hiScoreFormat, fa_right);\nelse {\nhiScoreFormat = scrString(\"high_score\") + \":\" + hiScoreFormat;\ndraw_text(384 - (string_length(hiScoreFormat) * 8) - 8, 8, hiScoreFormat);\n}", true);
+importGroup.QueueFindReplace("gml_Object_o46_Mas_Draw_0", "draw_text(_xv + 136, _yv + 160, scrString(\"to_next\") + \": \" + strNext);", "UFO50_CHS_draw_labeled_number(_xv + 136, _yv + 160, scrString(\"to_next\") + \": \", strNext, fa_left);", true);
+importGroup.QueueFindReplace("gml_Object_o08_Mas_Draw_0", "draw_text(200, 24, scrString(\"cont\") + strExtraLives);", "UFO50_CHS_draw_labeled_number(200, 24, scrString(\"cont\"), strExtraLives, fa_left);", true);
+importGroup.QueueFindReplace("gml_Object_o19_Mas_Draw_0", "draw_text(xMenu + 8, yMenu + 8, scrString(\"level_abbreviated\") + string(stringLevel));", "UFO50_CHS_draw_labeled_number(xMenu + 8, yMenu + 8, scrString(\"level_abbreviated\"), string(stringLevel), fa_left);", true);
 importGroup.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_text", @"
 function UFO50_CHS_draw_text(arg0, arg1, arg2)
 {
     var _font = draw_get_font();
+    var _numberFont = UFO50_CHS_number_font(arg2);
+    if (_numberFont >= 0) draw_set_font(_numberFont);
     var _spriteDigits = (_font == global.fontDigital || _font == global.fontDigitalMini || _font == global.fontDigitalBig || _font == global.fontDigital2);
-    if (global.language == global.LANG_JAPANESE && !_spriteDigits)
+    if (global.language == global.LANG_JAPANESE && !_spriteDigits && _numberFont < 0)
         arg1 -= 1;
     draw_text(arg0, arg1, arg2);
+    if (_numberFont >= 0) draw_set_font(_font);
 }
 ");
 importGroup.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_key_value_row", """
@@ -1144,8 +1212,10 @@ importGroup.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_text_ext", @"
 function UFO50_CHS_draw_text_ext(arg0, arg1, arg2, arg3, arg4)
 {
     var _font = draw_get_font();
+    var _numberFont = UFO50_CHS_number_font(arg2);
+    if (_numberFont >= 0) draw_set_font(_numberFont);
     var _spriteDigits = (_font == global.fontDigital || _font == global.fontDigitalMini || _font == global.fontDigitalBig || _font == global.fontDigital2);
-    if (global.language == global.LANG_JAPANESE && !_spriteDigits)
+    if (global.language == global.LANG_JAPANESE && !_spriteDigits && _numberFont < 0)
     {
         arg1 -= 1;
         arg2 = UFO50_CHS_wrap_text(arg2, arg4);
@@ -1154,18 +1224,42 @@ function UFO50_CHS_draw_text_ext(arg0, arg1, arg2, arg3, arg4)
             arg3 = _lineStep;
     }
     draw_text_ext(arg0, arg1, arg2, arg3, arg4);
+    if (_numberFont >= 0) draw_set_font(_font);
 }
 ");
 importGroup.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_text_color", @"
 function UFO50_CHS_draw_text_color(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
 {
     var _font = draw_get_font();
+    var _numberFont = UFO50_CHS_number_font(arg2);
+    if (_numberFont >= 0) draw_set_font(_numberFont);
     var _spriteDigits = (_font == global.fontDigital || _font == global.fontDigitalMini || _font == global.fontDigitalBig || _font == global.fontDigital2);
-    if (global.language == global.LANG_JAPANESE && !_spriteDigits)
+    if (global.language == global.LANG_JAPANESE && !_spriteDigits && _numberFont < 0)
         arg1 -= 1;
     draw_text_color(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+    if (_numberFont >= 0) draw_set_font(_font);
 }
 ");
+// 佐尔达斯星的计数先画补零，再以原版 8px 格遮罩写入有效位。
+// 数字与遮罩必须使用原精灵字体和基线，不能经过中文基线包装。
+importGroup.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_masked_counter", """
+function UFO50_CHS_draw_masked_counter(arg0, arg1, arg2, arg3)
+{
+    var _previousFont = draw_get_font();
+    var _previousColor = draw_get_color();
+    draw_set_font(global.fontBlocky);
+    draw_text(arg0, arg1, arg2);
+    draw_set_color(c_black);
+    for (var _q = 1; _q <= string_length(arg3); _q++)
+    {
+        if (string_char_at(arg3, _q) != " ")
+            draw_rectangle(arg0 + ((_q - 1) * 8), arg1, arg0 + (_q * 8) - 1, arg1 + 7, false);
+    }
+    draw_set_color(_previousColor);
+    draw_text(arg0, arg1, arg3);
+    draw_set_font(_previousFont);
+}
+""");
 importGroup.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_name_grid_line", @"
 function UFO50_CHS_draw_name_grid_line(arg0, arg1, arg2)
 {
@@ -1314,6 +1408,271 @@ avianosImportGroup.Import();
 
 // Zpix 保持官方原文件不变。GameMaker 没有 TTF 基线偏移参数，因此把三个
 // 实际使用的内置文字绘制函数重定向到包装脚本，只在中文（日语槽）把 Y 上移 1px。
+
+// 隔离实机复现的固定行排版：测量中文行高，保留原框和图标数量。
+void FixLayout(string codeName, string oldText, string newText)
+{
+    var code = Data.Code.ByName(codeName);
+    if (code == null) throw new System.Exception($"Missing verified layout target: {codeName}");
+    var group = new UndertaleModLib.Compiler.CodeImportGroup(Data);
+    group.ThrowOnNoOpFindReplace = true;
+    group.QueueFindReplace(code, oldText, newText, true);
+    group.Import();
+}
+
+foreach (var counter in new[] {
+    new { Position = "viewx + 320, viewy + 200", Template = "0:00:00", Value = "string_format(hours, 1, 0) + \":\" + string_format(minutes, 2, 0) + \":\" + string_format(seconds, 2, 0)" },
+    new { Position = "viewx + 352, viewy + 64 + (24 * i)", Template = "00", Value = "string_format(resources[i] - resDelta[i], 2, 0)" }
+})
+{
+    var original = $"draw_text({counter.Position}, \"{counter.Template}\");\n    draw_text_bg({counter.Position}, {counter.Value}, 0, 8, 8, true, false);";
+    // 资源循环的第二行缩进为 8 个空格。
+    if (counter.Template == "00") original = original.Replace("\n    draw_text_bg", "\n        draw_text_bg");
+    FixLayout("gml_Object_o48_Game_Draw_0", original,
+        $"if (global.language == global.LANG_JAPANESE)\n        UFO50_CHS_draw_masked_counter({counter.Position}, \"{counter.Template}\", {counter.Value});\n    else {{\n    {original}\n    }}");
+}
+
+FixLayout("gml_Object_o22_Game_Draw_0",
+    "else if (state == STATE_CHAR_SELECT)\n{",
+    "else if (state == STATE_CHAR_SELECT)\n{\n    var _statStep = (global.language == global.LANG_JAPANESE) ? max(8, ceil(string_height(\"中\"))) : 8;\n    var _statTop = (global.language == global.LANG_JAPANESE) ? min(400, 432 - (3 * _statStep) - 2) : 400;");
+foreach (var row in new[] { new { Y = 400, Key = "speed", I = 0 }, new { Y = 408, Key = "control", I = 1 }, new { Y = 416, Key = "power", I = 2 } })
+{
+    FixLayout("gml_Object_o22_Game_Draw_0",
+        $"+ 192, {row.Y}, \"{row.Key}\",",
+        $"+ 192, _statTop + ({row.I} * _statStep), \"{row.Key}\",");
+}
+var statGroup = new UndertaleModLib.Compiler.CodeImportGroup(Data);
+statGroup.ThrowOnNoOpFindReplace = true;
+foreach (var row in new[] { new { Y = 403, I = 0 }, new { Y = 411, I = 1 }, new { Y = 419, I = 2 } })
+{
+    statGroup.QueueRegexFindReplace(Data.Code.ByName("gml_Object_o22_Game_Draw_0"),
+        @"(draw_sprite\(sFX_StarRotate,[^\r\n]*), " + row.Y + @"\);",
+        "$1, _statTop + (" + row.I + " * _statStep) + 3);", true);
+    statGroup.QueueRegexFindReplace(Data.Code.ByName("gml_Object_o22_Game_Draw_0"),
+        @"(draw_sprite_ext\(sFX_StarRotate,[^\r\n]*), " + (row.Y + 1) + @", 1\.2,",
+        "$1, _statTop + (" + row.I + " * _statStep) + 4, 1.2,", true);
+}
+statGroup.Import();
+
+FixLayout("gml_Object_o32_Mas_Draw_0", "var _y = _yNews + 136 + (i * 8);",
+    "var _newsStep = (global.language == global.LANG_JAPANESE) ? max(8, ceil(string_height(\"中\"))) : 8;\n        var _y = _yNews + 136 + (i * _newsStep);");
+
+FixLayout("gml_Object_o38_Mas_Draw_0", "var _w_stage_name = string_length(_stage_name_string) * 8;",
+    "var _stageStep = (global.language == global.LANG_JAPANESE) ? max(8, ceil(string_height(\"中\"))) : 8;\n        scrSetFont(global.fontTall);\n        var _w_stage_name = (global.language == global.LANG_JAPANESE) ? string_width(_stage_name_string) : string_length(_stage_name_string) * 8;");
+FixLayout("gml_Object_o38_Mas_Draw_0", "var _y_stage_name = _yview + 24;",
+    "var _y_stage_name = _yview + 16 + _stageStep + ((global.language == global.LANG_JAPANESE) ? 2 : 0);");
+
+// 超级斗士单人角色页：标签、值和输入图标分别留足实测行高。
+foreach (var row in new[] { new { Old = 48, New = 44, Key = "\"movement\"" }, new { Old = 56, New = 55, Key = "charMovementName[char[0]]" }, new { Old = 72, New = 70, Key = "\"weapon\"" }, new { Old = 80, New = 81, Key = "charWeaponName[char[0]]" } })
+{
+    FixLayout("gml_Object_o42_Game_Draw_0", $"104, {row.Old}, 8, 64, 0, 8, 4);".Insert(0, row.Key + ", "),
+        $"{row.Key}, 104, ((global.language == global.LANG_JAPANESE) ? {row.New} : {row.Old}), 8, 64, 0, 8, 4);");
+}
+foreach (var row in new[] { new { Old = 48, New = 52, Key = "controls_weapon_alt", Input = "[U][1]:" }, new { Old = 64, New = 68, Key = "controls_melee_attack", Input = "[D][1]:" }, new { Old = 80, New = 84, Key = "controls_block", Input = "[D]:" } })
+{
+    FixLayout("gml_Object_o42_Game_Draw_0", $"scrStringDraw(264, {row.Old}, \"{row.Key}\");",
+        $"scrStringDraw(264, ((global.language == global.LANG_JAPANESE) ? {row.New} : {row.Old}), \"{row.Key}\");");
+    FixLayout("gml_Object_o42_Game_Draw_0", $"scrDrawTextInput(216, {row.Old}, \"{row.Input}\",",
+        $"scrDrawTextInput(216, ((global.language == global.LANG_JAPANESE) ? {row.New} : {row.Old}), \"{row.Input}\",");
+}
+
+
+// 虫灾猎手状态栏：汉字与原版 8px 计量图标各留独立空间。
+var bugGroup = new UndertaleModLib.Compiler.CodeImportGroup(Data);
+bugGroup.ThrowOnNoOpFindReplace = true;
+bugGroup.QueueRegexFindReplace(Data.Code.ByName("gml_Object_o20_Game_Draw_0"),
+    @"(draw_text_bg\((?:16|320), )8,", "$1((global.language == global.LANG_JAPANESE) ? 4 : 8),", true);
+foreach (var row in new[] { new { Sprite = "s20_KillMeter", Y = 24 }, new { Sprite = "s20_KillMeter", Y = 32 }, new { Sprite = "s20_KillMeter", Y = 40 }, new { Sprite = "s20_TreasureMeter", Y = 64 }, new { Sprite = "s20_TurnMeter", Y = 88 } })
+    bugGroup.QueueRegexFindReplace(Data.Code.ByName("gml_Object_o20_Game_Draw_0"),
+        @"(draw_sprite\(" + row.Sprite + @",[^\r\n]*), " + row.Y + @"\);",
+        "$1, ((global.language == global.LANG_JAPANESE) ? " + (row.Y + 4) + " : " + row.Y + "));", true);
+bugGroup.Import();
+
+// 双人行动计量条也已实机复现与中文标签重叠。
+var actionMeterGroup = new UndertaleModLib.Compiler.CodeImportGroup(Data);
+actionMeterGroup.ThrowOnNoOpFindReplace = true;
+actionMeterGroup.QueueRegexFindReplace(Data.Code.ByName("gml_Object_o20_Game_Draw_0"),
+    @"(draw_sprite\(s20_ActionMeter, [01], 8 \+ \(8 \* i\)), 88\);",
+    "$1, ((global.language == global.LANG_JAPANESE) ? 92 : 88));", true);
+actionMeterGroup.Import();
+
+// 罗刹的标签使用中文，分数和倒计时保留原版数字字形。
+FixLayout("gml_Object_o24_Mas_Draw_0",
+    "draw_text_color((_xview + 384) - 32, _yview + 16, tstring, tCol, tCol, tCol, tCol, 1);",
+    "if (global.language == global.LANG_JAPANESE) draw_set_font(global.fontDefault);\n" +
+    "draw_text_color((_xview + 384) - 32, _yview + ((global.language == global.LANG_JAPANESE) ? 20 : 16), tstring, tCol, tCol, tCol, tCol, 1);\n" +
+    "if (global.language == global.LANG_JAPANESE) scrSetFont(global.fontDefault);");
+FixLayout("gml_Object_o24_Mas_Draw_0", "draw_text(_xview + 8, _yview + 16, sstring);",
+    "if (global.language == global.LANG_JAPANESE) draw_set_font(global.fontDefault);\n" +
+    "draw_text(_xview + 8, _yview + ((global.language == global.LANG_JAPANESE) ? 20 : 16), sstring);\n" +
+    "if (global.language == global.LANG_JAPANESE) scrSetFont(global.fontDefault);");
+var rakshasaGroup = new UndertaleModLib.Compiler.CodeImportGroup(Data);
+rakshasaGroup.ThrowOnNoOpFindReplace = true;
+rakshasaGroup.QueueRegexFindReplace(Data.Code.ByName("gml_Object_o24_Mas_Draw_0"),
+    @"(draw_sprite\(s24_DeathCount,[^\r\n]*), _yview \+ 24\);",
+    "$1, _yview + ((global.language == global.LANG_JAPANESE) ? 32 : 24));", true);
+rakshasaGroup.Import();
+
+// 魔法花园的日文标签绘在背景精灵上。复用同帧空白板面覆盖标签，
+// 主题色和边框随原版 rank 变化，再绘制中文标题；不修改纹理像素。
+FixLayout("gml_Object_o27_BG_Draw_0", "draw_sprite(s27_bgSideJP, (_rank * 2) + 1, (_xv + 384) - 96, _yv);",
+    "draw_sprite(s27_bgSideJP, (_rank * 2) + 1, (_xv + 384) - 96, _yv);\n" +
+    "    draw_sprite_part(s27_bgSideJP, _rank * 2, 4, 80, 72, 12, _xv + 4, _yv + 52);\n" +
+    "    draw_sprite_part(s27_bgSideJP, (_rank * 2) + 1, 20, 80, 72, 12, _xv + 308, _yv + 52);\n" +
+    "    var _labelColor = draw_get_color();\n    scrSetFont(global.fontDefault);\n    draw_set_color(c_black);\n" +
+    "    draw_text(_xv + 16, _yv + 52, \"已救奥比\");\n    draw_text(_xv + 320, _yv + 52, \"分数\");\n    draw_set_color(_labelColor);");
+
+// 双人角色页同样已在隔离游戏中复现并保留证据。
+foreach (var row in new[] { new { Old = 48, New = 44, Key = "\"movement\"" }, new { Old = 56, New = 55, Key = "charMovementName[char[1]]" }, new { Old = 72, New = 70, Key = "\"weapon\"" }, new { Old = 80, New = 81, Key = "charWeaponName[char[1]]" } })
+    FixLayout("gml_Object_o42_Game_Draw_0", $"{row.Key}, 216, {row.Old}, 8, 64, 0, 8, 4);",
+        $"{row.Key}, 216, ((global.language == global.LANG_JAPANESE) ? {row.New} : {row.Old}), 8, 64, 0, 8, 4);");
+
+// 潜水员商店保持原输入索引，绘制按光标滚动；返回项和底部资源栏不挪出原框。
+var diverDraw = Data.Code.ByName("gml_Object_o19_Mas_Draw_0");
+var diverContext = new UndertaleModLib.Decompiler.GlobalDecompileContext(Data);
+var diverSource = GetDecompiledText(diverDraw, diverContext);
+var shopStart = diverSource.IndexOf("else if (currMenu == 1)");
+var shopEnd = diverSource.IndexOf("else if (currMenu == 2)", shopStart);
+if (shopStart < 0 || shopEnd < 0) throw new System.Exception("Missing verified diver shop branch.");
+var shopBefore = diverSource.Substring(shopStart, shopEnd - shopStart);
+var shopAfter = shopBefore.Replace("var yMenu = yv + 48;", "var yMenu = yv + 48;\n        var _shopStep = (global.language == global.LANG_JAPANESE) ? max(8, ceil(string_height(\"中\"))) : 8;\n        var _shopRows = max(1, floor(80 / _shopStep));\n        var _shopFirst = clamp(((menuSel == 99) ? pageLen : menuSel) - _shopRows + 1, 0, max(0, pageLen + 1 - _shopRows));")
+    .Replace("(8 * menuSel)", "(_shopStep * (menuSel - _shopFirst))")
+    .Replace("for (var i = 0; i < (pageLen + 1); i++)", "for (var i = _shopFirst; i < min(pageLen + 1, _shopFirst + _shopRows); i++)")
+    .Replace("(8 * i)", "(_shopStep * (i - _shopFirst))")
+    .Replace("yMenu + 128, stringBank", "yMenu + ((global.language == global.LANG_JAPANESE) ? 132 : 128), stringBank")
+    .Replace("yMenu + 128);", "yMenu + ((global.language == global.LANG_JAPANESE) ? 132 : 128));");
+shopAfter = shopAfter.Replace("draw_text(xMenu + 216,", "if (global.language == global.LANG_JAPANESE) draw_set_font(global.fontDefault);\n        draw_text(xMenu + 216,")
+    .Replace("draw_sprite(s19_MenuCoin, 0, xMenu + 208,", "if (global.language == global.LANG_JAPANESE) scrSetFont(global.fontDefault);\n        draw_sprite(s19_MenuCoin, 0, xMenu + 208,");
+shopAfter = shopAfter.Replace("var xstr = (xMenu + 128 + (i * 8)) - (ii * 80);",
+    "var xstr = (global.language == global.LANG_JAPANESE) ? xMenu + 128 + string_width(string_copy(strStore[storeText + ii], 1, i % 10)) : (xMenu + 128 + (i * 8)) - (ii * 80);")
+    .Replace("var ystr = (yMenu - 16) + (ii * 8);",
+    "var ystr = (yMenu - ((global.language == global.LANG_JAPANESE) ? 24 : 16)) + (ii * _shopStep);");
+shopAfter = shopAfter.Replace("if (menuSel != 99)\n        {\n            scrStringDraw", "if (_shopFirst > 0) draw_sprite(s19_MenuCursor, 4, xMenu + 16, yMenu + 8);\n        if ((_shopFirst + _shopRows) < (pageLen + 1)) draw_sprite(s19_MenuCursor, 5, xMenu + 240, yMenu + 96);\n        if (menuSel != 99)\n        {\n            scrStringDraw");
+// 两种珍宝费用沿用同一实测行高，图标与数量同步。
+shopAfter = shopAfter.Replace("yMenu + 120 + (4 * i)", "yMenu + 120 + ((_shopStep * i) / 2)");
+if (shopAfter == shopBefore) throw new System.Exception("Diver shop layout was not changed.");
+FixLayout("gml_Object_o19_Mas_Draw_0", shopBefore, shopAfter);
+
+
+// 长物品列表及三名角色左右手槽均已在隔离环境复现。滚动只改变绘制，
+// 原版装备/交换/返回逻辑仍接收原索引和 listOffset。
+diverSource = GetDecompiledText(diverDraw, new UndertaleModLib.Decompiler.GlobalDecompileContext(Data));
+var invStart = diverSource.IndexOf("else if (currMenu == 2)");
+var invEnd = diverSource.IndexOf("else if (currMenu == 5)", invStart);
+if (invStart < 0 || invEnd < 0) throw new System.Exception("Missing verified diver inventory branch.");
+var invBefore = diverSource.Substring(invStart, invEnd - invStart);
+var invAfter = invBefore.Replace("var selOff = menuSel + listOffset;",
+    "var _invStep = (global.language == global.LANG_JAPANESE) ? max(8, ceil(string_height(\"中\"))) : 8;\n" +
+    "        var _invRows = max(1, floor(80 / _invStep));\n" +
+    "        var _invFirst = (global.language == global.LANG_JAPANESE) ? clamp(((menuSel == 99) ? pageLen : menuSel) - _invRows + 1, 0, max(0, pageLen + 1 - _invRows)) : -listOffset;\n" +
+    "        var selOff = menuSel - _invFirst;")
+    .Replace("(8 * selOff)", "(_invStep * selOff)")
+    .Replace("var lLength = min(pageLen + 1, 10);", "var lLength = min(pageLen + 1, _invRows);")
+    .Replace("var ii = i - listOffset;", "var ii = i + _invFirst;")
+    .Replace("(8 * i)", "(_invStep * i)")
+    .Replace("if (listOffset < 0)", "if (_invFirst > 0)")
+    .Replace("if (pageLen > (9 - listOffset))", "if (pageLen >= (_invFirst + _invRows))");
+// 英文保持原版最多十行；中文固定窗口最多七行。
+invAfter = invAfter.Replace("var _invRows = max(1, floor(80 / _invStep));", "var _invRows = (global.language == global.LANG_JAPANESE) ? max(1, floor(80 / _invStep)) : 10;");
+invAfter = invAfter.Replace("var cursorY = yMenu + (8 * menuSel2);",
+    "var cursorY = yMenu + (8 * menuSel2) + ((global.language == global.LANG_JAPANESE) ? ((_invStep - 8) * (menuSel2 % 2)) : 0);")
+    .Replace("cursorY = yMenu + (8 * menuSel3);",
+    "cursorY = yMenu + (8 * menuSel3) + ((global.language == global.LANG_JAPANESE) ? ((_invStep - 8) * (menuSel3 % 2)) : 0);")
+    .Replace("var yOff = 8 * i;", "var yOff = (8 * i) + ((global.language == global.LANG_JAPANESE) ? ((_invStep - 8) * (i % 2)) : 0);");
+FixLayout("gml_Object_o19_Mas_Draw_0", invBefore, invAfter);
+
+
+// 诡石镇状态页/队伍页已复现：三行 vitals 改为实测行高，数值右对齐。
+// 生命/法力分数移除展示空格，为四位数预留空间，数字沿用原版字体。
+var grimVitals = new UndertaleModLib.Compiler.CodeImportGroup(Data);
+grimVitals.AutoCreateAssets = true;
+grimVitals.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_grim_vitals", """
+function UFO50_CHS_draw_grim_vitals(_x, _y, _player)
+{
+    var _step = max(8, ceil(string_height("中")));
+    var _labels = [scrString("stat_lvl"), scrString("stat_hp"), scrString("stat_sp")];
+    _labels[1] = string_replace(_labels[1], "值", "");
+    var _values = [string(_player.level), string(_player.hp) + "/" + string(_player.hpMax), string(_player.sp) + "/" + string(_player.spMax)];
+    for (var _row = 0; _row < 3; _row++)
+    {
+        scrSetFont(global.fontGrimstone);
+        draw_set_halign(fa_left);
+        draw_text(_x + 12, _y + (_row * _step), _labels[_row]);
+        draw_set_font(global.fontGrimstone);
+        draw_set_halign(fa_right);
+        draw_text(_x + 120, _y + (_row * _step), _values[_row]);
+    }
+    draw_set_halign(fa_left);
+    scrSetFont(global.fontGrimstone);
+}
+""");
+grimVitals.Import();
+FixLayout("gml_Object_o12__Game_Draw_0", "        tx = 152;\n        draw_text((viewx + tx) - 8, viewy + 32, scrString(\"stat_lvl\"));\n        draw_text(((viewx + tx) - 8) + 32, viewy + 32, string(party[currPlayer].level));\n        draw_text((viewx + tx) - 8, viewy + 40, scrString(\"stat_hp\"));\n        draw_text(((viewx + tx) - 8) + 32, viewy + 40, string(party[currPlayer].hp) + \" / \" + string(party[currPlayer].hpMax));\n        draw_text((viewx + tx) - 8, viewy + 48, scrString(\"stat_sp\"));\n        draw_text(((viewx + tx) - 8) + 32, viewy + 48, string(party[currPlayer].sp) + \" / \" + string(party[currPlayer].spMax));", "if (global.language == global.LANG_JAPANESE) { UFO50_CHS_draw_grim_vitals(viewx + 128, viewy + 28, party[currPlayer]); }\nelse {\n        tx = 152;\n        draw_text((viewx + tx) - 8, viewy + 32, scrString(\"stat_lvl\"));\n        draw_text(((viewx + tx) - 8) + 32, viewy + 32, string(party[currPlayer].level));\n        draw_text((viewx + tx) - 8, viewy + 40, scrString(\"stat_hp\"));\n        draw_text(((viewx + tx) - 8) + 32, viewy + 40, string(party[currPlayer].hp) + \" / \" + string(party[currPlayer].hpMax));\n        draw_text((viewx + tx) - 8, viewy + 48, scrString(\"stat_sp\"));\n        draw_text(((viewx + tx) - 8) + 32, viewy + 48, string(party[currPlayer].sp) + \" / \" + string(party[currPlayer].spMax));\n}");
+FixLayout("gml_Object_o12__Game_Draw_0", "            draw_text((viewx + 32 + 120) - 8, viewy + 32 + (48 * i), scrString(\"stat_lvl\"));\n            draw_text(((viewx + 32 + 120) - 8) + 32, viewy + 32 + (48 * i), string(party[i].level));\n            draw_text((viewx + 32 + 120) - 8, viewy + 40 + (48 * i), scrString(\"stat_hp\"));\n            draw_text(((viewx + 32 + 120) - 8) + 32, viewy + 40 + (48 * i), string(party[i].hp) + \" / \" + string(party[i].hpMax));\n            draw_text((viewx + 32 + 120) - 8, viewy + 48 + (48 * i), scrString(\"stat_sp\"));\n            draw_text(((viewx + 32 + 120) - 8) + 32, viewy + 48 + (48 * i), string(party[i].sp) + \" / \" + string(party[i].spMax));", "if (global.language == global.LANG_JAPANESE) { UFO50_CHS_draw_grim_vitals(viewx + 128, viewy + 28 + (48 * i), party[i]); }\nelse {\n            draw_text((viewx + 32 + 120) - 8, viewy + 32 + (48 * i), scrString(\"stat_lvl\"));\n            draw_text(((viewx + 32 + 120) - 8) + 32, viewy + 32 + (48 * i), string(party[i].level));\n            draw_text((viewx + 32 + 120) - 8, viewy + 40 + (48 * i), scrString(\"stat_hp\"));\n            draw_text(((viewx + 32 + 120) - 8) + 32, viewy + 40 + (48 * i), string(party[i].hp) + \" / \" + string(party[i].hpMax));\n            draw_text((viewx + 32 + 120) - 8, viewy + 48 + (48 * i), scrString(\"stat_sp\"));\n            draw_text(((viewx + 32 + 120) - 8) + 32, viewy + 48 + (48 * i), string(party[i].sp) + \" / \" + string(party[i].spMax));\n}");
+
+
+// 瓦尔布雷斯商店：独立计算名称/价格列，正文、列表、余额框连续布局。
+var valbraceGroup = new UndertaleModLib.Compiler.CodeImportGroup(Data);
+valbraceGroup.AutoCreateAssets = true;
+valbraceGroup.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_valbrace_shop", """
+function UFO50_CHS_draw_valbrace_shop()
+{
+    if (instance_exists(oTextBox)) exit;
+    var _xv = camera_get_view_x(view_get_camera(0));
+    var _yv = camera_get_view_y(view_get_camera(0));
+    var _items = shopWith.itemList;
+    var _count = ds_list_size(_items);
+    var _step = max(10, ceil(string_height("中"))) + 2;
+    var _nameWidth = 0;
+    var _priceWidth = 0;
+    for (var _i = 0; _i < _count; _i++)
+    {
+        var _item = ds_list_find_value(_items, _i);
+        var _traits = scr35_EquipmentTraits(_item);
+        _nameWidth = max(_nameWidth, string_width(_traits[0]));
+        if (!stealing) _priceWidth = max(_priceWidth, string_width(scrStringFormat(scrString("crone_trade_format"), "", scr35_ItemCost(_item))));
+    }
+    var _w = max(128, _nameWidth + _priceWidth + 56);
+    var _dialog = scrStringSplit(stealing ? "crone_steal_dialog" : "crone_trade_dialog", 24, 3);
+    var _dialogHeight = scrDrawTextBoxGetHeight(_dialog, 32, 12, 3);
+    scrDrawMenuBorder(_xv + 72, _yv + 8, 240, _dialogHeight);
+    for (var _i = 0; _i < 3; _i++) draw_text(_xv + 88, _yv + 20 + (12 * _i), _dialog[_i]);
+    var _top = _yv + 8 + _dialogHeight + 4;
+    scrDrawMenuBorder(_xv + 80, _top, _w, 20 + (_step * _count));
+    for (var _i = 0; _i < _count; _i++)
+    {
+        var _item = ds_list_find_value(_items, _i);
+        var _traits = scr35_EquipmentTraits(_item);
+        var _rowY = _top + 10 + (_step * _i);
+        draw_set_halign(fa_left);
+        if (_i == inventorySelect) { draw_text(_xv + 96, _rowY, ">"); draw_set_color(global.palette[3]); }
+        draw_text(_xv + 112, _rowY, _traits[0]);
+        if (!stealing)
+        {
+            draw_set_halign(fa_right);
+            draw_text(_xv + 80 + _w - 12, _rowY, scrStringFormat(scrString("crone_trade_format"), "", scr35_ItemCost(_item)));
+        }
+        draw_set_color(global.palette[0]);
+    }
+    draw_set_halign(fa_left);
+    var _balance = scrStringFormat(scrString("item_gem_plural"), gemCount);
+    var _balanceY = _top + 20 + (_step * _count);
+    scrDrawMenuBorder(_xv + 88, _balanceY, string_width(_balance) + 16, 24);
+    if (gemCount < scr35_ItemCost(ds_list_find_value(_items, inventorySelect))) draw_set_color(global.palette[9]);
+    draw_text(_xv + 96, _balanceY + 8, _balance);
+    draw_set_color(global.palette[0]);
+}
+""");
+valbraceGroup.Import();
+// 后期商店已复现 NOSTRING：原代码与资源的锁子甲键拼写不同。
+FixLayout("gml_GlobalScript_scr35_EquipmentTraits", "scrString(\"armor_chain_mail\")",
+    "scrString((global.language == global.LANG_JAPANESE) ? \"armor_chainmail\" : \"armor_chain_mail\")");
+FixLayout("gml_GlobalScript_scr35_DrawShopUI", "function scr35_DrawShopUI()\n{",
+    "function scr35_DrawShopUI()\n{\n    if (global.language == global.LANG_JAPANESE) { UFO50_CHS_draw_valbrace_shop(); exit; }");
+
+// 诡石镇战斗姓名避免被面板上边框盖住；H/S 与数值沿用原版小字体。
+FixLayout("gml_Object_o12__Game_Draw_0", "                draw_text(tx + 8, ty, party[j].name);\n                draw_text(tx + 12, (ty - 4) + 16, scrString(\"stat_hp_short\") + \" \" + string(party[j].hp));\n                draw_text(tx + 12, (ty - 4) + 16 + 8, scrString(\"stat_sp_short\") + \" \" + string(party[j].sp));", "if (global.language == global.LANG_JAPANESE)\n                {\n                    draw_text(tx + 8, ty + 4, party[j].name);\n                    draw_set_font(global.fontGrimstone);\n                    draw_text(tx + 12, ty + 16, scrString(\"stat_hp_short\") + \" \" + string(party[j].hp));\n                    draw_text(tx + 12, ty + 24, scrString(\"stat_sp_short\") + \" \" + string(party[j].sp));\n                    scrSetFont(global.fontGrimstone);\n                }\n                else {\n                draw_text(tx + 8, ty, party[j].name);\n                draw_text(tx + 12, (ty - 4) + 16, scrString(\"stat_hp_short\") + \" \" + string(party[j].hp));\n                draw_text(tx + 12, (ty - 4) + 16 + 8, scrString(\"stat_sp_short\") + \" \" + string(party[j].sp));\n}");
+
 var chsDrawText = Data.Code.ByName("gml_GlobalScript_UFO50_CHS_draw_text");
 var chsDrawTextExt = Data.Code.ByName("gml_GlobalScript_UFO50_CHS_draw_text_ext");
 var chsDrawTextColor = Data.Code.ByName("gml_GlobalScript_UFO50_CHS_draw_text_color");
@@ -1321,7 +1680,9 @@ var chsAvianosMixed = Data.Code.ByName("gml_GlobalScript_UFO50_CHS_draw_avianos_
 if (chsDrawText == null || chsDrawTextExt == null || chsDrawTextColor == null || chsAvianosMixed == null)
     throw new System.Exception("Failed to create CHS baseline wrapper code entries.");
 
-var wrapperCodes = new HashSet<UndertaleCode>() { chsDrawText, chsDrawTextExt, chsDrawTextColor, chsAvianosMixed };
+var chsMaskedCounter = Data.Code.ByName("gml_GlobalScript_UFO50_CHS_draw_masked_counter");
+if (chsMaskedCounter == null) throw new System.Exception("Missing original-font masked counter.");
+var wrapperCodes = new HashSet<UndertaleCode>() { chsDrawText, chsDrawTextExt, chsDrawTextColor, chsAvianosMixed, chsMaskedCounter };
 var redirectedCalls = new Dictionary<string, int>()
 {
     { "draw_text", 0 },
@@ -1355,6 +1716,14 @@ foreach (var code in Data.Code.ToList())
 if ((redirectedCalls["draw_text"] + avianosDrawTextCalls) < 1500 || redirectedCalls["draw_text_ext"] < 60 || redirectedCalls["draw_text_color"] < 15)
     throw new System.Exception($"Unexpected text-call coverage: draw_text={redirectedCalls["draw_text"]}, avianos_mixed={avianosDrawTextCalls}, draw_text_ext={redirectedCalls["draw_text_ext"]}, draw_text_color={redirectedCalls["draw_text_color"]}");
 baselineImportGroup.Import();
+
+// 覆盖门禁：新增数字或动态字符串绘制点也必须进入统一字体路由。
+var bypassedDraws = Data.Code.Where(code => code.Offset == 0 && !wrapperCodes.Contains(code))
+    .Where(code => code.Instructions.Any(instruction => instruction.Kind == UndertaleInstruction.Opcode.Call &&
+        redirectedCalls.ContainsKey(instruction.ValueFunction?.Name?.Content ?? "")))
+    .Select(code => code.Name.Content).ToList();
+if (bypassedDraws.Count > 0)
+    throw new System.Exception("Text drawing bypasses CHS routing: " + string.Join(", ", bypassedDraws));
 
 foreach (var str in Data.Strings.Where(str => str.Content == "にほんご"))
     str.Content = "中文";

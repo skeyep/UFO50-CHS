@@ -1,20 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
+import { project, readMetaLanguage } from "./project-paths.mjs";
 
-const root = path.resolve(import.meta.dirname, "..");
-const gmlPath = path.join(root, "chs-tools", "all-code", "CodeEntries", "gml_GlobalScript_scrLoadInternalText.gml");
-const humanPath = path.join(root, "chs-tools", "translations", "meta-human-zh.json");
-const game51Path = path.join(root, "chs-tools", "translations", "game-51-human-zh.json");
-const outputPath = path.join(root, "chs-tools", "staging", "JAPANESE", "m_Text.json");
+const gmlPath = project.metaGml;
+const humanPath = path.join(project.translationsDir, "meta-human-zh.json");
+const game51Path = path.join(project.translationsDir, "game-51-human-zh.json");
+const outputPath = path.join(project.outputDir, "m_Text.json");
 
-const lines = fs.readFileSync(gmlPath, "utf8").split(/\r?\n/).slice(0, 5923);
-const assignment = /global\.TEXT_META(?:\.([A-Za-z0-9_]+)|\[\$\s*"([^"]+)"\])\s*=\s*("(?:\\.|[^"\\])*");/;
-const english = {};
-for (const line of lines) {
-  const match = line.match(assignment);
-  if (!match) continue;
-  english[match[1] ?? match[2]] = JSON.parse(match[3]);
-}
+const english = readMetaLanguage(gmlPath, "ENGLISH");
 
 const human = JSON.parse(fs.readFileSync(humanPath, "utf8"));
 const game51 = JSON.parse(fs.readFileSync(game51Path, "utf8"));

@@ -1,25 +1,19 @@
 import fs from "node:fs";
 import path from "node:path";
+import { project, readMetaLanguage } from "./project-paths.mjs";
 
-const root = path.resolve(import.meta.dirname, "..");
-const gmlPath = path.join(root, "chs-tools", "all-code", "CodeEntries", "gml_GlobalScript_scrLoadInternalText.gml");
-const legacyPath = path.join(root, "chs-tools", "translations", "meta-zh-cache.json");
-const humanPath = path.join(root, "chs-tools", "translations", "meta-human-zh.json");
-const reviewDir = path.join(root, "chs-review");
+const root = project.repoRoot;
+const gmlPath = project.metaGml;
+const humanPath = path.join(project.translationsDir, "meta-human-zh.json");
+const reviewDir = project.reviewDir;
 
-const assignment = /global\.TEXT_META(?:\.([A-Za-z0-9_]+)|\[\$\s*"([^"]+)"\])\s*=\s*("(?:\\.|[^"\\])*");/g;
-const source = fs.readFileSync(gmlPath, "utf8");
-const variants = {};
-for (const match of source.matchAll(assignment)) {
-  const key = match[1] ?? match[2];
-  (variants[key] ??= []).push(JSON.parse(match[3]));
-}
-
-const legacy = JSON.parse(fs.readFileSync(legacyPath, "utf8"));
+const english = readMetaLanguage(gmlPath, "ENGLISH");
+const japanese = readMetaLanguage(gmlPath, "JAPANESE");
+const variants = Object.fromEntries(Object.keys(english).map(key => [key, [english[key], japanese[key]]]));
 const human = JSON.parse(fs.readFileSync(humanPath, "utf8"));
-const keys = Object.keys(legacy);
-for (const key of Object.keys(human)) {
-  if (!(key in variants)) throw new Error(`人工元数据包含未知键：${key}`);
+const keys = Object.keys(human);
+for (const key of keys) {
+  if (!(key in english)) throw new Error(`人工元数据包含未知键：${key}`);
 }
 
 function category(key) {

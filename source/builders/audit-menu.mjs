@@ -1,10 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
+import { project } from "./project-paths.mjs";
 import { menuStatus } from "./menu-review-policy.mjs";
 
-const root = path.resolve(import.meta.dirname, "..");
-const englishPath = path.join(root, "ext", "ENGLISH", "0_Text.json");
-const outputPath = path.join(root, "chs-tools", "staging", "JAPANESE", "0_Text.json");
+const englishPath = path.join(project.englishDir, "0_Text.json");
+const outputPath = path.join(project.outputDir, "0_Text.json");
 
 function decode(file) {
   const raw = Buffer.from(fs.readFileSync(file, "ascii").trim(), "base64").toString("utf8");

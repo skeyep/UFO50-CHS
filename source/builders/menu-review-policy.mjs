@@ -1,4 +1,4 @@
-import reviewedKeys from "./translations/menu-reviewed-keys.json" with { type: "json" };
+import reviewedKeys from "../translations/menu-reviewed-keys.json" with { type: "json" };
 
 const explicitReviewed = new Set(reviewedKeys);
 

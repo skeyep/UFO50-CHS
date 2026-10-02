@@ -1,14 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
+import { project } from "./project-paths.mjs";
 import { grimstoneStatus } from "./grimstone-review-policy.mjs";
 
-const root = path.resolve(import.meta.dirname, "..");
-const reviewDir = path.join(root, "chs-review");
-const englishPath = path.join(root, "ext", "ENGLISH", "12_Text.json");
-const legacyJapanesePath = path.join(root, "chs-backup", "prototype-20260809", "ext", "JAPANESE", "12_Text.json");
-const portableJapanesePath = path.join(root, "reference", "JAPANESE-original", "12_Text.json");
-const japanesePath = fs.existsSync(legacyJapanesePath) ? legacyJapanesePath : portableJapanesePath;
-const cachePath = path.join(root, "chs-tools", "translations", "grimstone-zh-cache.json");
+const root = project.repoRoot;
+const reviewDir = project.reviewDir;
+const englishPath = path.join(project.englishDir, "12_Text.json");
+const japanesePath = path.join(project.japaneseDir, "12_Text.json");
+const cachePath = path.join(project.translationsDir, "grimstone-zh-cache.json");
 
 function decode(file) {
   const raw = Buffer.from(fs.readFileSync(file, "ascii").trim(), "base64").toString("utf8");
@@ -22,33 +21,6 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
-}
-
-const initialManual = new Set([
-  "gold_goal", "cherry_goal", "garden_goal", "pre_gold_record", "post_gold_record",
-  "detail_1", "detail_2", "status_normal", "menu_buy", "menu_sell", "menu_exit",
-  "menu_deposit", "menu_withdraw", "menu_mount", "menu_item", "menu_skill", "menu_equip",
-  "menu_stats", "menu_order", "menu_nextpage", "menu_prevpage", "shop_owned",
-  "shop_dialogue_01", "shop_dialogue_02", "shop_inv_full", "shop_buy_item",
-  "shop_no_teeth", "shop_plot_item", "shop_sell_check", "no_teeth", "battle_menu_01",
-  "battle_menu_02", "battle_menu_03", "battle_attack_who", "battle_heal_who",
-  "battle_victory", "battle_won_teeth", "battle_won_xp", "battle_levelup_01",
-  "battle_levelup_02", "battle_died", "intro_01", "intro_02", "intro_03", "intro_04",
-  "intro_05", "intro_06", "intro_07", "battle_uses_on"
-]);
-
-const explicitManual = new Set([
-  "pdesc_05", "npc_santonio_13", "npc_heston_10", "npc_riovalle_02", "npc_hotel_19", "bar_01"
-]);
-
-function statusFor(key) {
-  if (initialManual.has(key) || explicitManual.has(key)) return "人工初校";
-  if (/^(?:fire_|malus_|biggan_|ending_)/.test(key)) return "人工初校";
-  if (/^npc_(?:pleasant|santonio|heston|auster|fortjason)_/.test(key)) return "人工初校";
-  if (/^npc_(?:riovalle|elpasaje|lawbuck|agartha|francesco)_/.test(key)) return "人工初校";
-  if (/^npc_(?:badbetty|leo|zad)_/.test(key)) return "人工初校";
-  if (/^(?:name_|name_wolf_|town_|status_|stat_|item_|skill_|learned_)/.test(key)) return "术语初校";
-  return "待人工重译";
 }
 
 function categoryFor(key) {

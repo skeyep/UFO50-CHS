@@ -1,10 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
+import { project, positionalArgs } from "./project-paths.mjs";
 
-const id = process.argv[2];
-if (!/^\d+$/.test(id ?? "")) throw new Error("用法：node chs-tools/audit-game.mjs <游戏内部 ID>");
+const id = positionalArgs[0];
+if (!/^\d+$/.test(id ?? "")) throw new Error("用法：node source/builders/audit-game.mjs <游戏内部 ID>");
 const active = process.argv.includes("--active");
-const root = path.resolve(import.meta.dirname, "..");
 
 function decode(file) {
   const raw = Buffer.from(fs.readFileSync(file, "ascii").trim(), "base64").toString("utf8");
@@ -15,11 +15,11 @@ function signature(value) {
   return (String(value).match(/\*+|@+|\^+|\[[12UDLR]/g) ?? []).sort().join("|");
 }
 
-const english = decode(path.join(root, "ext", "ENGLISH", `${id}_Text.json`));
+const english = decode(path.join(project.englishDir, `${id}_Text.json`));
 const output = decode(active
-  ? path.join(root, "ext", "JAPANESE", `${id}_Text.json`)
-  : path.join(root, "chs-tools", "staging", "JAPANESE", `${id}_Text.json`));
-const human = JSON.parse(fs.readFileSync(path.join(root, "chs-tools", "translations", `game-${id}-human-zh.json`), "utf8"));
+  ? path.join(project.referenceRoot, "ext", "JAPANESE", `${id}_Text.json`)
+  : path.join(project.outputDir, `${id}_Text.json`));
+const human = JSON.parse(fs.readFileSync(path.join(project.translationsDir, `game-${id}-human-zh.json`), "utf8"));
 const actual = Object.entries(english).filter(([key, value]) => typeof value === "string" && value.trim() && !/_(?:lim|wl|wc)$/.test(key));
 const missingHuman = actual.filter(([key]) => !(key in human)).map(([key]) => key);
 const unknownHuman = Object.keys(human).filter(key => !(key in english));

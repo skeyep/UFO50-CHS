@@ -1,25 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
+import { project, readMetaLanguage } from "./project-paths.mjs";
 
-const root = path.resolve(import.meta.dirname, "..");
-const gmlPath = path.join(root, "chs-tools", "all-code", "CodeEntries", "gml_GlobalScript_scrLoadInternalText.gml");
-const translationPath = path.join(root, "chs-tools", "translations", "game-51-human-zh.json");
-const reviewDir = path.join(root, "chs-review");
-const source = fs.readFileSync(gmlPath, "utf8").split(/\r?\n/);
-const assignment = /global\.TEXT_META(?:\.([A-Za-z0-9_]+)|\[\$\s*"([^"]+)"\])\s*=\s*("(?:\\.|[^"\\])*");/;
-
-function extract(start, end) {
-  const result = {};
-  for (const line of source.slice(start, end)) {
-    const match = line.match(assignment);
-    if (match) result[match[1] ?? match[2]] = JSON.parse(match[3]);
-  }
-  return result;
-}
-
-// Language blocks in scrLoadInternalText.gml are stable in this game build.
-const english = extract(2, 5923);
-const japanese = extract(35528, source.length);
+const gmlPath = project.metaGml;
+const translationPath = path.join(project.translationsDir, "game-51-human-zh.json");
+const reviewDir = project.reviewDir;
+const english = readMetaLanguage(gmlPath, "ENGLISH");
+const japanese = readMetaLanguage(gmlPath, "JAPANESE");
 const chinese = fs.existsSync(translationPath)
   ? JSON.parse(fs.readFileSync(translationPath, "utf8"))
   : {};

@@ -1,11 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
+import { project } from "./project-paths.mjs";
 import { grimstoneIsApproved } from "./grimstone-review-policy.mjs";
 
-const root = path.resolve(import.meta.dirname, "..");
-const sourcePath = path.join(root, "ext", "ENGLISH", "12_Text.json");
-const cachePath = path.join(root, "chs-tools", "translations", "grimstone-zh-cache.json");
-const outputPath = path.join(root, "chs-tools", "staging", "JAPANESE", "12_Text.json");
+const sourcePath = path.join(project.englishDir, "12_Text.json");
+const cachePath = path.join(project.translationsDir, "grimstone-zh-cache.json");
+const outputPath = path.join(project.outputDir, "12_Text.json");
 
 function decode(file) {
   const raw = Buffer.from(fs.readFileSync(file, "ascii").trim(), "base64").toString("utf8");
@@ -20,12 +20,13 @@ function encodeOfficialStyle(file, object) {
 }
 
 const source = decode(sourcePath);
-const cache = fs.existsSync(cachePath) ? JSON.parse(fs.readFileSync(cachePath, "utf8")) : {};
+const cache = JSON.parse(fs.readFileSync(cachePath, "utf8"));
 
 let approvedCount = 0;
 for (const [key, value] of Object.entries(cache)) {
   if (!(key in source)) throw new Error(`Grimstone 缓存包含未知键：${key}`);
   if (/_(?:lim|wl|wc)$/.test(key)) throw new Error(`Grimstone 缓存不应修改布局键：${key}`);
+  if (typeof value !== "string") throw new Error(`Grimstone 译文必须是字符串：${key}`);
   if (grimstoneIsApproved(key)) {
     source[key] = value;
     approvedCount++;

@@ -1,17 +1,18 @@
 import fs from "node:fs";
 import path from "node:path";
+import { project, positionalArgs } from "./project-paths.mjs";
 
-const id = process.argv[2];
+const id = positionalArgs[0];
 if (!id || !/^\d+$/.test(id)) {
-  console.error("用法：node chs-tools/build-game-review.mjs <游戏ID> [输出名]");
+  console.error("用法：node source/builders/build-game-review.mjs <游戏ID> [输出名]");
   process.exit(1);
 }
 
-const root = path.resolve(import.meta.dirname, "..");
-const outputName = process.argv[3] || `game-${id}-review`;
+const root = project.repoRoot;
+const outputName = positionalArgs[1] || `game-${id}-review`;
 
 function decodeExternal(relativePath) {
-  const wrapped = fs.readFileSync(path.join(root, relativePath), "ascii").trim();
+  const wrapped = fs.readFileSync(path.join(project.referenceRoot, relativePath), "ascii").trim();
   const json = Buffer.from(wrapped, "base64")
     .toString("utf8")
     .replace(/,\s*}\s*$/, "}");
@@ -20,7 +21,7 @@ function decodeExternal(relativePath) {
 
 const english = decodeExternal(`ext/ENGLISH/${id}_Text.json`);
 const japanese = decodeExternal(`reference/JAPANESE-original/${id}_Text.json`);
-const humanPath = path.join(root, `chs-tools/translations/game-${id}-human-zh.json`);
+const humanPath = path.join(project.translationsDir, `game-${id}-human-zh.json`);
 const chinese = JSON.parse(fs.readFileSync(humanPath, "utf8"));
 
 const rows = Object.entries(english).filter(
@@ -58,7 +59,7 @@ rows.forEach(([key, value], index) => {
   );
 });
 
-const outputDir = path.join(root, "chs-review");
+const outputDir = project.reviewDir;
 fs.mkdirSync(outputDir, { recursive: true });
 const outputPath = path.join(outputDir, `${outputName}.txt`);
 fs.writeFileSync(outputPath, `\uFEFF${lines.join("\n")}`, "utf8");

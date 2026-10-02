@@ -41,7 +41,7 @@ foreach ($file in Get-ChildItem -LiteralPath (Join-Path $root 'source\translatio
     $null = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
 }
 $translationSources = @(Get-ChildItem -LiteralPath (Join-Path $root 'source\translations') -File -Filter '*.json')
-if ($translationSources.Count -ne 53) { throw "Expected 53 translation sources, found $($translationSources.Count)." }
+if ($translationSources.Count -ne 54) { throw "Expected 54 translation sources, found $($translationSources.Count)." }
 $game51Source = Get-Content -LiteralPath (Join-Path $root 'source\translations\game-51-human-zh.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 if (@($game51Source.PSObject.Properties).Count -ne 547) { throw 'Unexpected game 51 translation count.' }
 $metaPayload = Get-Content -LiteralPath (Join-Path $payloadRoot 'm_Text.json') -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -77,4 +77,6 @@ foreach ($file in Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object
     }
 }
 
+& node (Join-Path $PSScriptRoot 'validate-source-payload.mjs')
+if ($LASTEXITCODE -ne 0) { throw 'Source and payload synchronization validation failed.' }
 Write-Host "Repository validation passed: $($payload.Count) payload files, $($translationSources.Count) translation sources."
