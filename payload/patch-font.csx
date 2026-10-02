@@ -69,10 +69,10 @@ function scrSetFont(arg0)
     var _font = arg0;
     if (font_exists(_font))
     {
-        if (global.language == global.LANG_JAPANESE && font_exists(global.fontDefault_CHS))
+        var _spriteDigits = (_font == global.fontDigital || _font == global.fontDigitalMini || _font == global.fontDigitalBig || _font == global.fontDigital2);
+        if (global.language == global.LANG_JAPANESE && font_exists(global.fontDefault_CHS) && !_spriteDigits)
         {
-            // 中文不能交给任何只包含拉丁/日文字形的精灵字体。
-            // 统一路由也覆盖各子游戏运行时创建并通过变量传入的专用字体。
+            // 墙钟和比分牌沿用原版数字精灵的尺寸，其余文字使用中文字体。
             _font = global.fontDefault_CHS;
         }
         draw_set_font(_font);
@@ -529,9 +529,18 @@ function string_line_breaks(arg0, arg1, arg2)
         var _line = "";
         var _stop = false;
         var _width = arg1 * 8;
+        var _lineWidth = 0;
+        var _lastToken = "";
+        var _lastTokenWidth = 0;
         var _noLineStart = "，。！？；：、）》】」』…";
         var _noLineEnd = "（《【「『";
         var _text = string_replace_all(arg0, global.CARRIAGE_RETURN, global.CARRIAGE_RETURN_SIMPLIFIED);
+        var _inputControls = false;
+        for (var _scan = 1; _scan < string_length(_text); _scan++)
+        {
+            if (string_char_at(_text, _scan) == "[" && string_pos(string_char_at(_text, _scan + 1), "UDLR12SEeF") > 0)
+                _inputControls = true;
+        }
         var _previousFont = global.currFont;
         draw_set_font(global.fontDefault_CHS);
         global.tooLongWord = false;
@@ -546,6 +555,13 @@ function string_line_breaks(arg0, arg1, arg2)
                     _char += "*";
                     _i++;
                 }
+            }
+            else if (_char == "[" && _i < string_length(_text) && string_pos(string_char_at(_text, _i + 1), "UDLR12SEeF") > 0)
+            {
+                // 输入绘制器同时接受 [U 和 [U]，只消费这一枚图标。
+                _char += string_char_at(_text, ++_i);
+                if (string_char_at(_text, _i + 1) == "]")
+                    _char += string_char_at(_text, ++_i);
             }
             else if (_char == "{" || _char == "[")
             {
@@ -563,6 +579,9 @@ function string_line_breaks(arg0, arg1, arg2)
             {
                 _lines[_lineCount++] = _line;
                 _line = "";
+                _lineWidth = 0;
+                _lastToken = "";
+                _lastTokenWidth = 0;
                 if (arg2 > 0 && _lineCount >= arg2)
                 {
                     _stop = true;
@@ -573,21 +592,71 @@ function string_line_breaks(arg0, arg1, arg2)
             if (_char == " " && _line == "")
                 continue;
             var _candidate = _line + _char;
-            if (_line != "" && string_width(_candidate) > _width)
+            var _tokenWidth = 0;
+            if (_inputControls)
+            {
+                var _button = string_char_at(_char, 2);
+                if (string_char_at(_char, 1) == "[" && string_pos(_button, "UDLR12SEeF") > 0)
+                {
+                    _tokenWidth = 8;
+                    // 早期资源加载尚未初始化按键表；实际详情页按当前绑定测宽。
+                    if (variable_global_exists("keyMap") && variable_global_exists("KEY_ICON_WIDTH"))
+                    {
+                        var _index = string_pos(_button, "UDLR12S") - 1;
+                        if (_button == "E") _index = 6;
+                        if (global.inputFocus == 2)
+                        {
+                            if (_index >= 0)
+                                _tokenWidth = global.JOY_ICON_WIDTH[scrGetJoyIndex(global.joyMap[0][_index])];
+                            else
+                                _tokenWidth = 0;
+                        }
+                        else
+                        {
+                            var _key = -1;
+                            if (_index >= 0) _key = global.keyMap[0][_index];
+                            if (_button == "E") _key = 27;
+                            if (_button == "e") _key = 13;
+                            if (_button == "F") _key = 112;
+                            if (_key >= 0) _tokenWidth = global.KEY_ICON_WIDTH[_key];
+                        }
+                    }
+                }
+                else if (string_char_at(_char, 1) == "{" && string_pos(_button, "UDLR") > 0)
+                {
+                    _tokenWidth = 8;
+                }
+                else
+                {
+                    for (var _part = 1; _part <= string_length(_char); _part++)
+                    {
+                        var _glyph = string_char_at(_char, _part);
+                        _tokenWidth += (ord(_glyph) >= 12288) ? string_width(_glyph) : 8;
+                    }
+                }
+            }
+            var _candidateWidth = _inputControls ? (_lineWidth + _tokenWidth) : string_width(_candidate);
+            if (_line != "" && _candidateWidth > _width)
             {
                 var _nextLine = (_char == " ") ? "" : _char;
+                var _nextWidth = (_char == " ") ? 0 : _tokenWidth;
                 if (_char != " ")
                 {
                     var _lastPos = string_length(_line);
                     var _lastChar = string_char_at(_line, _lastPos);
-                    if ((string_pos(_char, _noLineStart) > 0 || string_pos(_lastChar, _noLineEnd) > 0) && _lastPos > 1)
+                    if ((string_pos(_char, _noLineStart) > 0 || string_pos(_lastChar, _noLineEnd) > 0) && _lastPos > string_length(_lastToken))
                     {
-                        _line = string_delete(_line, _lastPos, 1);
-                        _nextLine = _lastChar + _char;
+                        // 标点回退也必须移动整枚图标，不能拆开 [2 等控制符。
+                        _line = string_delete(_line, _lastPos - string_length(_lastToken) + 1, string_length(_lastToken));
+                        _nextLine = _lastToken + _char;
+                        _nextWidth += _lastTokenWidth;
                     }
                 }
                 _lines[_lineCount++] = _line;
                 _line = _nextLine;
+                _lineWidth = _nextWidth;
+                _lastToken = (_nextLine == "") ? "" : _char;
+                _lastTokenWidth = (_nextLine == "") ? 0 : _tokenWidth;
                 if (arg2 > 0 && _lineCount >= arg2)
                 {
                     _stop = true;
@@ -597,7 +666,10 @@ function string_line_breaks(arg0, arg1, arg2)
             else
             {
                 _line = _candidate;
-                if (string_width(_line) > _width)
+                _lineWidth = _candidateWidth;
+                _lastToken = _char;
+                _lastTokenWidth = _tokenWidth;
+                if (_candidateWidth > _width)
                     global.tooLongWord = true;
             }
         }
@@ -876,7 +948,9 @@ importGroup.QueueFindReplace("gml_Object_oPauseMenu_Draw_0", "\nif (state == STA
 importGroup.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_text", @"
 function UFO50_CHS_draw_text(arg0, arg1, arg2)
 {
-    if (global.language == global.LANG_JAPANESE)
+    var _font = draw_get_font();
+    var _spriteDigits = (_font == global.fontDigital || _font == global.fontDigitalMini || _font == global.fontDigitalBig || _font == global.fontDigital2);
+    if (global.language == global.LANG_JAPANESE && !_spriteDigits)
         arg1 -= 1;
     draw_text(arg0, arg1, arg2);
 }
@@ -1069,7 +1143,9 @@ function UFO50_CHS_draw_avianos_mixed(arg0, arg1, arg2)
 importGroup.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_text_ext", @"
 function UFO50_CHS_draw_text_ext(arg0, arg1, arg2, arg3, arg4)
 {
-    if (global.language == global.LANG_JAPANESE)
+    var _font = draw_get_font();
+    var _spriteDigits = (_font == global.fontDigital || _font == global.fontDigitalMini || _font == global.fontDigitalBig || _font == global.fontDigital2);
+    if (global.language == global.LANG_JAPANESE && !_spriteDigits)
     {
         arg1 -= 1;
         arg2 = UFO50_CHS_wrap_text(arg2, arg4);
@@ -1083,7 +1159,9 @@ function UFO50_CHS_draw_text_ext(arg0, arg1, arg2, arg3, arg4)
 importGroup.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_text_color", @"
 function UFO50_CHS_draw_text_color(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
 {
-    if (global.language == global.LANG_JAPANESE)
+    var _font = draw_get_font();
+    var _spriteDigits = (_font == global.fontDigital || _font == global.fontDigitalMini || _font == global.fontDigitalBig || _font == global.fontDigital2);
+    if (global.language == global.LANG_JAPANESE && !_spriteDigits)
         arg1 -= 1;
     draw_text_color(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 }
@@ -1195,6 +1273,24 @@ foreach (var target in manualLineStepTargets)
     targetGroup.QueueFindReplace(targetCode, target.Old, target.New, true);
     targetGroup.Import();
 }
+
+// 烫脚球的三行隐藏留言绕过通用多行绘制；按实际行高保留底部边界。
+var hotfootMetaOld = """
+                draw_text_bg_centered(192, 176, scrStringManual("game_meta_message_43_1", 0), 0, 8, 8, 0);
+                draw_text_bg_centered(192, 184, scrStringManual("game_meta_message_43_2", 0), 0, 8, 8, 0);
+                draw_text_bg_centered(192, 192, scrStringManual("game_meta_message_43_3", 0), 0, 8, 8, 0);
+""";
+var hotfootMetaNew = """
+                var _metaStep = (global.language == global.LANG_JAPANESE) ? max(8, ceil(string_height("中"))) : 8;
+                var _metaTop = min(176, 216 - (3 * _metaStep));
+                draw_text_bg_centered(192, _metaTop, scrStringManual("game_meta_message_43_1", 0), 0, 8, _metaStep, 0);
+                draw_text_bg_centered(192, _metaTop + _metaStep, scrStringManual("game_meta_message_43_2", 0), 0, 8, _metaStep, 0);
+                draw_text_bg_centered(192, _metaTop + (2 * _metaStep), scrStringManual("game_meta_message_43_3", 0), 0, 8, _metaStep, 0);
+""";
+var hotfootMetaGroup = new UndertaleModLib.Compiler.CodeImportGroup(Data);
+hotfootMetaGroup.ThrowOnNoOpFindReplace = true;
+hotfootMetaGroup.QueueFindReplace(Data.Code.ByName("gml_Object_o43_Game_Draw_0"), hotfootMetaOld, hotfootMetaNew, true);
+hotfootMetaGroup.Import();
 
 // AVIANOS 把 ASCII 字符映射为资源、兵种、建筑和状态图标；中文槽不能把这些
 // 字符一并路由到 Zpix。该游戏的普通绘制改为逐字符混排：ASCII 保留原图标字体，

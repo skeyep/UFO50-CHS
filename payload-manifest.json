@@ -1,6 +1,6 @@
 {
-    "version":  "0.2.0",
-    "generatedAt":  "2026-10-02T15:38:08.2790421Z",
+    "version":  "0.2.1",
+    "generatedAt":  "2026-10-02T17:04:19.5402107Z",
     "files":  [
                   {
                       "path":  "installer/Common.ps1",
@@ -44,8 +44,8 @@
                   },
                   {
                       "path":  "payload/ext/JAPANESE/12_Text.json",
-                      "sha256":  "17636FA665738E6BB60A5C80B66FD61F7DCDFCC62A2E63BF7D0D60A2221C248A",
-                      "size":  184432
+                      "sha256":  "47EBAC8FBD5CBFC348BA60B827A1DA55CF489CF1F805BEB84B2E9C03A33631B7",
+                      "size":  184452
                   },
                   {
                       "path":  "payload/ext/JAPANESE/13_Text.json",
@@ -104,8 +104,8 @@
                   },
                   {
                       "path":  "payload/ext/JAPANESE/23_Text.json",
-                      "sha256":  "5AE6753F1E41D7DCCB58599BB49B3DB0BB0D679C0F55318DD97C83A4F1B6CC43",
-                      "size":  3432
+                      "sha256":  "59A792714269AF212121EA613C10830FBFE50330477407CC248D817F25ACF472",
+                      "size":  3440
                   },
                   {
                       "path":  "payload/ext/JAPANESE/24_Text.json",
@@ -219,8 +219,8 @@
                   },
                   {
                       "path":  "payload/ext/JAPANESE/44_Text.json",
-                      "sha256":  "430D514B1D8655576F571CB3A54503FC9BD9E29640A180AC87984DA003BF735A",
-                      "size":  10412
+                      "sha256":  "6EB0EA030131EFC402D6B89BB1A89F8CAC3F7FEC28E37C8A57299C463215AB94",
+                      "size":  10408
                   },
                   {
                       "path":  "payload/ext/JAPANESE/45_Text.json",
@@ -284,17 +284,17 @@
                   },
                   {
                       "path":  "payload/patch-font.csx",
-                      "sha256":  "77FDBEF3C665CEB2926EB5D45C8BAD5C836C9DACA972A093FE4C97F19011AACC",
-                      "size":  56269
+                      "sha256":  "62E3B3518AE072D2557B1B826E432FE2C74CD21519892B65352EDFEEA699E637",
+                      "size":  61898
                   },
                   {
                       "path":  "README.txt",
-                      "sha256":  "E085188A8D595FE659D97B212AA0D3CDF6A303ACFB7C3DC8BAAEE5609535F730",
+                      "sha256":  "189ABC229AD12A4677ADE5D61BFC3F0F0CEFF283B5C484CC8BACBB6101AD7780",
                       "size":  1579
                   },
                   {
                       "path":  "release-config.json",
-                      "sha256":  "2E3A6BDD5C90CECAC26F90EA0580E76E2D96BBFC54888AB1760516150F5AE2E5",
+                      "sha256":  "0423C8A9BD591B40C9239E524559D82E87B50371C523B03193681AF5782D1DA9",
                       "size":  869
                   },
                   {

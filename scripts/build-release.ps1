@@ -1,5 +1,5 @@
 param(
-    [string]$Version = '0.2.0',
+    [string]$Version,
     [string]$DependencyCache
 )
 
@@ -7,6 +7,7 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $root = (Resolve-Path -LiteralPath (Split-Path -Parent $PSScriptRoot)).Path
 $config = Get-Content -LiteralPath (Join-Path $root 'release-config.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+if ([string]::IsNullOrWhiteSpace($Version)) { $Version = [string]$config.version }
 if ([string]$config.version -ne $Version) { throw 'Version mismatch.' }
 if ([string]::IsNullOrWhiteSpace($DependencyCache)) {
     $DependencyCache = Join-Path $env:LOCALAPPDATA 'UFO50-CHS\cache'

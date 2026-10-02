@@ -1,8 +1,10 @@
-param([string]$Version = '0.2.0')
+param([string]$Version)
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 $root = (Resolve-Path -LiteralPath (Split-Path -Parent $PSScriptRoot)).Path
+$config = Get-Content -LiteralPath (Join-Path $root 'release-config.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+if ([string]::IsNullOrWhiteSpace($Version)) { $Version = [string]$config.version }
 $paths = @(
     'Install-UFO50-CHS.cmd',
     'Uninstall-UFO50-CHS.cmd',

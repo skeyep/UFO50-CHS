@@ -56,9 +56,10 @@ foreach ($protocol in @{
     }
 }
 $config = Get-Content -LiteralPath (Join-Path $root 'release-config.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-if ([string]$config.version -ne '0.2.0') { throw 'Unexpected release version.' }
+if ([string]$config.version -notmatch '^\d+\.\d+\.\d+$') { throw 'Invalid release version.' }
 
 $manifest = Get-Content -LiteralPath (Join-Path $root 'payload-manifest.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+if ([string]$manifest.version -ne [string]$config.version) { throw 'Manifest version mismatch.' }
 foreach ($entry in $manifest.files) {
     $relative = [string]$entry.path
     if ($relative.Contains('..')) { throw "Invalid manifest path: $relative" }

@@ -1,6 +1,6 @@
 # UFO 50 简体中文汉化
 
-Windows Steam 版《UFO 50》的简体中文汉化补丁，当前版本为 **v0.2.0**。
+Windows Steam 版《UFO 50》的简体中文汉化补丁，最新发布版本为 **v0.2.0**。
 
 由 **Skeyep_目目**与 **GPT-5.6 Sol** 协作完成。
 
