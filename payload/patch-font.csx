@@ -1581,6 +1581,70 @@ invAfter = invAfter.Replace("var cursorY = yMenu + (8 * menuSel2);",
     .Replace("var yOff = 8 * i;", "var yOff = (8 * i) + ((global.language == global.LANG_JAPANESE) ? ((_invStep - 8) * (i % 2)) : 0);");
 FixLayout("gml_Object_o19_Mas_Draw_0", invBefore, invAfter);
 
+// 深潜者：珍珠、宝箱和战斗奖励均已实机复现图标覆盖中文及可见的 %。
+// % 是原版精灵字体的空白图标格，中文按实际前缀宽度定位，图标仍占 8px/格。
+var diverRewards = new UndertaleModLib.Compiler.CodeImportGroup(Data);
+diverRewards.AutoCreateAssets = true;
+diverRewards.QueueReplace("gml_GlobalScript_UFO50_CHS_divers_icon_x", """
+function UFO50_CHS_divers_icon_x(_x, _text)
+{
+    var _pos = string_pos("%", _text);
+    if (global.language != global.LANG_JAPANESE) return _x + (8 * (_pos - 1));
+    return _x + round(string_width(string_copy(_text, 1, max(0, _pos - 1))));
+}
+""");
+diverRewards.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_divers_reward", """
+function UFO50_CHS_draw_divers_reward(_x, _y, _text, _slots)
+{
+    var _pos = string_pos("%", _text);
+    if (global.language != global.LANG_JAPANESE || _pos == 0)
+    {
+        draw_text(_x, _y, _text);
+        return;
+    }
+    var _iconX = UFO50_CHS_divers_icon_x(_x, _text);
+    draw_text(_x, _y, string_copy(_text, 1, _pos - 1));
+    var _tail = string_delete(_text, 1, _pos + _slots - 1);
+    var _tailX = _iconX + (8 * _slots);
+    var _digits = 0;
+    while (_digits < string_length(_tail))
+    {
+        if (string_pos(string_char_at(_tail, _digits + 1), "0123456789") == 0) break;
+        _digits++;
+    }
+    if (_digits > 0)
+    {
+        var _value = string_copy(_tail, 1, _digits);
+        var _font = draw_get_font();
+        var _numberFont = UFO50_CHS_number_font(_value);
+        if (_numberFont >= 0) draw_set_font(_numberFont);
+        var _numberWidth = string_width(_value);
+        draw_text(_tailX, _y, _value);
+        draw_set_font(_font);
+        _tailX += _numberWidth;
+        _tail = string_delete(_tail, 1, _digits);
+    }
+    draw_text(_tailX, _y, _tail);
+}
+""");
+diverRewards.Import();
+FixLayout("gml_Object_o19_Mas_Draw_0", "draw_text(xv + 16, yMenu + 8, textBox[0]);",
+    "UFO50_CHS_draw_divers_reward(xv + 16, yMenu + 8, textBox[0], 2);");
+FixLayout("gml_Object_o19_Mas_Draw_0", "var iconPos = xv + 16 + (8 * (string_pos(\"%\", textBox[0]) - 1));",
+    "var iconPos = UFO50_CHS_divers_icon_x(xv + 16, textBox[0]);");
+FixLayout("gml_Object_o19_Mas_Draw_0", "draw_text(xMenu + 16, yMenu + 16 + (8 * i), textBox[i]);",
+    "UFO50_CHS_draw_divers_reward(xMenu + 16, yMenu + 16 + (8 * i), textBox[i], 1);");
+FixLayout("gml_Object_o19_Mas_Draw_0", "var coinX = xMenu + 16 + (8 * (string_pos(\"%\", textBox[0]) - 1));",
+    "var coinX = UFO50_CHS_divers_icon_x(xMenu + 16, textBox[0]);");
+FixLayout("gml_Object_o19_Mas_Draw_0", "var relicX = xMenu + 16 + (8 * (string_pos(\"%\", textBox[0]) - 1));",
+    "var relicX = UFO50_CHS_divers_icon_x(xMenu + 16, textBox[0]);");
+FixLayout("gml_Object_o19_Mas_Draw_0", "draw_text(xv + 16, yBar + 16 + (16 * i), textBox[i]);",
+    "UFO50_CHS_draw_divers_reward(xv + 16, yBar + 16 + (16 * i), textBox[i], 1);");
+FixLayout("gml_Object_o19_Mas_Draw_0", "var coinX = xv + 16 + (8 * (string_pos(\"%\", textBox[0]) - 1));",
+    "var coinX = UFO50_CHS_divers_icon_x(xv + 16, textBox[0]);");
+FixLayout("gml_Object_o19_Mas_Draw_0", "var relicX = xv + 16 + (8 * (string_pos(\"%\", textBox[0]) - 1));",
+    "var relicX = UFO50_CHS_divers_icon_x(xv + 16, textBox[(global.language == global.LANG_JAPANESE) ? 1 : 0]);");
+
 
 // 诡石镇状态页/队伍页已复现：三行 vitals 改为实测行高，数值右对齐。
 // 生命/法力分数移除展示空格，为四位数预留空间，数字沿用原版字体。
