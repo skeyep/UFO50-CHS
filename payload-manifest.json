@@ -1,6 +1,6 @@
 {
-  "version": "1.0.1",
-  "generatedAt": "2026-10-07T15:27:57.8522463Z",
+  "version": "1.0.2",
+  "generatedAt": "2026-10-08T12:04:09.1646593Z",
   "files": [
     {
       "path": "Install-UFO50-CHS.cmd",
@@ -44,13 +44,13 @@
     },
     {
       "path": "payload/ext/JAPANESE/12_Text.json",
-      "sha256": "47EBAC8FBD5CBFC348BA60B827A1DA55CF489CF1F805BEB84B2E9C03A33631B7",
-      "size": 184452
+      "sha256": "74FB20EC72DFC148EED9DAD2D22E744946250055159D8DE8C8A7EFBEC2EE1048",
+      "size": 184396
     },
     {
       "path": "payload/ext/JAPANESE/13_Text.json",
-      "sha256": "1F01B4237D778BBAC8E99021E8770D9AB096913BAFD69393A0607CF04AEE17F0",
-      "size": 18960
+      "sha256": "492D0852D71D9B960AE81DD9F4514854D24359C9C2201CBA3E4D4D6CDE932013",
+      "size": 18940
     },
     {
       "path": "payload/ext/JAPANESE/14_Text.json",
@@ -94,8 +94,8 @@
     },
     {
       "path": "payload/ext/JAPANESE/21_Text.json",
-      "sha256": "A5E234A9DD768401FE4B1AD3330F86C433AA82C94ED7E95E874968F797344A2C",
-      "size": 10492
+      "sha256": "6B0638C999AFF70665CFD6E4EDCD1F08755A15BD87BED9054A432B7C4C0EC5B9",
+      "size": 10476
     },
     {
       "path": "payload/ext/JAPANESE/22_Text.json",
@@ -104,8 +104,8 @@
     },
     {
       "path": "payload/ext/JAPANESE/23_Text.json",
-      "sha256": "59A792714269AF212121EA613C10830FBFE50330477407CC248D817F25ACF472",
-      "size": 3440
+      "sha256": "20C2F4166AAF39FF7888872DB7DC8893D27CBF9E983DDB4A1461298D06141734",
+      "size": 3460
     },
     {
       "path": "payload/ext/JAPANESE/24_Text.json",
@@ -124,8 +124,8 @@
     },
     {
       "path": "payload/ext/JAPANESE/27_Text.json",
-      "sha256": "F55723F9FB65111DFD3586178D6DB55F7B0EB32807946435D698DED98F019909",
-      "size": 2668
+      "sha256": "80A4B78AE1BDCC6BE2B2BBD9479D62CBCDEF9E9F85C67DDCE417E38F122563D2",
+      "size": 2660
     },
     {
       "path": "payload/ext/JAPANESE/28_Text.json",
@@ -144,13 +144,13 @@
     },
     {
       "path": "payload/ext/JAPANESE/30_Text.json",
-      "sha256": "CD2FB644AF9386A1E40A3BCCF54D2C7594302C8738A1B80BA032362956C4D3E2",
-      "size": 9624
+      "sha256": "FB7C22224F342F4636C01C54407C7D2D14DF8C92FBF985CBA7795D5200402ED8",
+      "size": 9608
     },
     {
       "path": "payload/ext/JAPANESE/31_Text.json",
-      "sha256": "7181A89067B68EC82434AD2BE5684E00EF075D0BB316232C8CF19A9E93F5E0BF",
-      "size": 5908
+      "sha256": "1D376469E8D209E74C17646F22DD837C1584F60B2A81CEFF756F940744F31589",
+      "size": 5916
     },
     {
       "path": "payload/ext/JAPANESE/32_Text.json",
@@ -184,8 +184,8 @@
     },
     {
       "path": "payload/ext/JAPANESE/38_Text.json",
-      "sha256": "1442D5ED62494B4BC1F40F91351A269FD8341BEA65C4E9263D037F278D8BDFAD",
-      "size": 11060
+      "sha256": "11427EC824853E33AEFF0B5AF2EB6E0A7E781777799EF2985CFD57BF3D9ED3E5",
+      "size": 11044
     },
     {
       "path": "payload/ext/JAPANESE/39_Text.json",
@@ -194,7 +194,7 @@
     },
     {
       "path": "payload/ext/JAPANESE/4_Text.json",
-      "sha256": "FBC49E07CD02E8A5E384F540B014F10B6321728B89EE44907F1FCB6888810E19",
+      "sha256": "3E8D5E1F3A7D95A3CA7171CA96774F1D556596FD0D64B8105E0BEF5CC9F3F042",
       "size": 4128
     },
     {
@@ -209,8 +209,8 @@
     },
     {
       "path": "payload/ext/JAPANESE/42_Text.json",
-      "sha256": "ACC632A7319CEF823180D2704B1860EC1DB73F016D9ED6862AE83431F98F0628",
-      "size": 8952
+      "sha256": "C84AACAA16BD141F6407FBAC7062B5712A8BB9F59D6C87D448B7BD448174AD56",
+      "size": 8936
     },
     {
       "path": "payload/ext/JAPANESE/43_Text.json",
@@ -259,7 +259,7 @@
     },
     {
       "path": "payload/ext/JAPANESE/6_Text.json",
-      "sha256": "EBE7824390466BCF3EF6BA9EFE57873EE3FA63A3A17840517D6C9135C9DC9A24",
+      "sha256": "AE7EC73CEECB7C320914263FF511CCF67BFCEC05A075846DA4B39961B063B108",
       "size": 27556
     },
     {
@@ -269,7 +269,7 @@
     },
     {
       "path": "payload/ext/JAPANESE/8_Text.json",
-      "sha256": "5D4A0B46EE75AE62F73DD46B6148A59CFFB8FA366EBADB998FB504F924D3046A",
+      "sha256": "19EC14A996BEF35C237AEF8928FC14EEB63FB8A47D4AD54049B10DD17F015875",
       "size": 8412
     },
     {
@@ -284,17 +284,17 @@
     },
     {
       "path": "payload/patch-font.csx",
-      "sha256": "4DE45A99CD6D3DA74BA7CD445452AF62AC03FC0085C28BE6870101048CB131B5",
-      "size": 94311
+      "sha256": "ABF325D15FF535C04318635480F2699CDC592713CCFCAC17FBC8E874B01A15F7",
+      "size": 106938
     },
     {
       "path": "README.txt",
-      "sha256": "51611C4314B9417806DEB1F1223ECF15FB68936D7A92A3638AE9EF90DEFDDBCB",
+      "sha256": "3E96E18723CC10502453D86E03259024889F8A743D4B918F9FCEF6BCBB8DD79B",
       "size": 1579
     },
     {
       "path": "release-config.json",
-      "sha256": "A920FEE11E6C4A487F0DF9BA3E48AA66E1E1EABC58C572DE1302BBACA92BA3DC",
+      "sha256": "7C9427D363C433FB1C8695B06D341DE301958E5C3DAD13F2DA25CA436A3909A4",
       "size": 869
     },
     {

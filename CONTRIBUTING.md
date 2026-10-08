@@ -71,7 +71,9 @@ python scripts/make-number-closeups.py --evidence-dir '<实机证据目录>'
 python scripts/validate-number-evidence.py --evidence-dir '<实机证据目录>'
 ```
 
-数字特写脚本需要 Pillow，并读取与截图同名的 `*-numbers.json` 绘制记录；记录包含文字、字体、边界、摄像机和 GUI 尺寸。静态清单中的“候选”及动态项需要继续核对，不代表已完成实机验收。
+数字特写脚本需要 Pillow，并读取与截图同名的 `*-numbers.json` 绘制记录；记录包含文字、字体、边界、摄像机和 GUI 尺寸。静态清单中的候选及动态项逐项进入实机场景复核。
+
+标签与数字挤在一起的问题，使用 `scripts/audit-text-adjacency.py` 从所有文字的 `*-texts.json` 记录识别相邻项，生成包含标签与数字的特写及实际间距。字段限长和英日动态参数顺序用 `scripts/audit-format-contracts.py` 清点；流程及记录格式见 [维护与发布工作流](docs/WORKFLOW.md#格式与数字审阅)。
 
 字体检查另外要求记录 `currentIsCHS`，发现纯数字仍使用中文字体时返回失败。临时提示层及暂停菜单必须成对保存、恢复当前字体和原版请求字体；只恢复中文字体句柄会丢失数字样式。检查通过后仍需逐张查看放大特写，包括自动记录在画面外、延迟出现和特殊场景的条目。
 

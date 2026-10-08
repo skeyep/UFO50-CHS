@@ -26,6 +26,10 @@ const menuOriginal = {
 function checkCoverage(payload, keys, name) {
   for (const [key, value] of Object.entries(payload)) {
     if (typeof value !== "string") throw new Error(`载荷字段必须是字符串：${name}/${key}`);
+    const limit = Number(payload[`${key}_lim`] ?? 0);
+    if (limit > 0 && [...value].length > limit) {
+      throw new Error(`文本被运行时字符上限截断：${name}/${key}，长度 ${[...value].length}，上限 ${limit}`);
+    }
     if (!value.trim() || layoutKey.test(key) || keys.has(key)) continue;
     if (name === "0_Text.json" && menuOriginal[key] === value) continue;
     // 元数据中的原版内部简称、输入代码、榜单姓名和职员表由参考资源审计核对。

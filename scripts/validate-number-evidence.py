@@ -2,19 +2,20 @@
 import argparse
 import json
 import pathlib
+import re
 
 parser = argparse.ArgumentParser(description='检查实机纯数字字体，并列出缺失证据。')
 parser.add_argument('--evidence-dir', required=True, type=pathlib.Path)
 options = parser.parse_args()
 root = options.evidence_dir.resolve()
 files = sorted(root.glob('game-*/*-numbers.json'))
-allowed = set('0123456789 +-/:.,%$()MXPx×^')
+allowed = set('0123456789 +-/:.,%$()MHSPXx×^')
 failures = []
 numeric = 0
 for file in files:
     for index, row in enumerate(json.loads(file.read_text(encoding='utf-8'))):
         value = str(row['text'])
-        if not any(c in '0123456789' for c in value) or not set(value) <= allowed:
+        if not any(c in '0123456789' for c in value) or not (set(value) <= allowed or re.fullmatch(r'[+-]?\d+(?:ATK|DEF|SPD|EVD)', value)):
             continue
         numeric += 1
         reason = None

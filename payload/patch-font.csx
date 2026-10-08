@@ -1010,6 +1010,20 @@ importGroup.QueueFindReplace("gml_Object_o17__Game_Draw_0", "hiScoreFormat = scr
 importGroup.QueueFindReplace("gml_Object_o46_Mas_Draw_0", "draw_text(_xv + 136, _yv + 160, scrString(\"to_next\") + \": \" + strNext);", "UFO50_CHS_draw_labeled_number(_xv + 136, _yv + 160, scrString(\"to_next\") + \": \", strNext, fa_left);", true);
 importGroup.QueueFindReplace("gml_Object_o08_Mas_Draw_0", "draw_text(200, 24, scrString(\"cont\") + strExtraLives);", "UFO50_CHS_draw_labeled_number(200, 24, scrString(\"cont\"), strExtraLives, fa_left);", true);
 importGroup.QueueFindReplace("gml_Object_o19_Mas_Draw_0", "draw_text(xMenu + 8, yMenu + 8, scrString(\"level_abbreviated\") + string(stringLevel));", "UFO50_CHS_draw_labeled_number(xMenu + 8, yMenu + 8, scrString(\"level_abbreviated\"), string(stringLevel), fa_left);", true);
+// Sprite fonts with a shadow/outline lose that layer when routed to Zpix.
+// Keep the request paired with the active font; bare fonts and sprite digits
+// retain their original paths. Solid-cell backgrounds remain caller-owned.
+importGroup.QueueReplace("gml_GlobalScript_UFO50_CHS_outline_enabled", @"
+function UFO50_CHS_outline_enabled()
+{
+    if (global.language != global.LANG_JAPANESE || draw_get_font() != global.fontDefault_CHS)
+        return false;
+    var _requested = global.chsRequestedFont;
+    return _requested == global.fontDefault || _requested == global.fontDefault_JP
+        || _requested == global.fontThinOutline || _requested == global.fontTall
+        || _requested == global.fontTallBG;
+}
+");
 importGroup.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_text", @"
 function UFO50_CHS_draw_text(arg0, arg1, arg2)
 {
@@ -1019,6 +1033,15 @@ function UFO50_CHS_draw_text(arg0, arg1, arg2)
     var _spriteDigits = (_font == global.fontDigital || _font == global.fontDigitalMini || _font == global.fontDigitalBig || _font == global.fontDigital2);
     if (global.language == global.LANG_JAPANESE && !_spriteDigits && _numberFont < 0)
         arg1 -= 1;
+    if (_numberFont < 0 && UFO50_CHS_outline_enabled() && draw_get_color() != c_black)
+    {
+        var _faceColor = draw_get_color();
+        draw_set_color(c_black);
+        for (var _dx = -1; _dx <= 1; _dx++)
+            for (var _dy = -1; _dy <= 1; _dy++)
+                if (_dx != 0 || _dy != 0) draw_text(arg0 + _dx, arg1 + _dy, arg2);
+        draw_set_color(_faceColor);
+    }
     draw_text(arg0, arg1, arg2);
     if (_numberFont >= 0) draw_set_font(_font);
 }
@@ -1223,6 +1246,15 @@ function UFO50_CHS_draw_text_ext(arg0, arg1, arg2, arg3, arg4)
         if (arg3 > 0 && arg3 < _lineStep)
             arg3 = _lineStep;
     }
+    if (_numberFont < 0 && UFO50_CHS_outline_enabled() && draw_get_color() != c_black)
+    {
+        var _faceColor = draw_get_color();
+        draw_set_color(c_black);
+        for (var _dx = -1; _dx <= 1; _dx++)
+            for (var _dy = -1; _dy <= 1; _dy++)
+                if (_dx != 0 || _dy != 0) draw_text_ext(arg0 + _dx, arg1 + _dy, arg2, arg3, arg4);
+        draw_set_color(_faceColor);
+    }
     draw_text_ext(arg0, arg1, arg2, arg3, arg4);
     if (_numberFont >= 0) draw_set_font(_font);
 }
@@ -1236,6 +1268,14 @@ function UFO50_CHS_draw_text_color(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg
     var _spriteDigits = (_font == global.fontDigital || _font == global.fontDigitalMini || _font == global.fontDigitalBig || _font == global.fontDigital2);
     if (global.language == global.LANG_JAPANESE && !_spriteDigits && _numberFont < 0)
         arg1 -= 1;
+    if (_numberFont < 0 && UFO50_CHS_outline_enabled()
+        && (arg3 != c_black || arg4 != c_black || arg5 != c_black || arg6 != c_black))
+    {
+        for (var _dx = -1; _dx <= 1; _dx++)
+            for (var _dy = -1; _dy <= 1; _dy++)
+                if (_dx != 0 || _dy != 0)
+                    draw_text_color(arg0 + _dx, arg1 + _dy, arg2, c_black, c_black, c_black, c_black, arg7);
+    }
     draw_text_color(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
     if (_numberFont >= 0) draw_set_font(_font);
 }
@@ -1420,6 +1460,45 @@ void FixLayout(string codeName, string oldText, string newText)
     group.Import();
 }
 
+// Elfazar card reward: retain the six-step reveal/retract animation, with
+// measured CJK advances. The original 8px path remains for other languages.
+FixLayout("gml_Object_o31_CardFx_Draw_0",
+    "draw_text((x - 24) + (8 * i), y, c);",
+    "if (global.language == global.LANG_JAPANESE)\n        {\n            var _cardText = string_copy(text, 1, 6);\n            var _cardLeft = x - string_width(_cardText) * 0.5;\n            UFO50_CHS_draw_card_text(_cardLeft + string_width(string_copy(_cardText, 1, i)), y, c);\n        }\n        else draw_text((x - 24) + (8 * i), y, c);");
+// 原版精灵字体自带黑边；Zpix 卡牌提示补回 1px 黑边和亮色字面。
+var cardContrastGroup = new UndertaleModLib.Compiler.CodeImportGroup(Data);
+cardContrastGroup.AutoCreateAssets = true;
+cardContrastGroup.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_card_text", """
+function UFO50_CHS_draw_card_text(_x, _y, _text)
+{
+    _y -= 1;
+    var _oldColor = draw_get_color();
+    var _oldAlpha = draw_get_alpha();
+    draw_set_alpha(1);
+    draw_set_color(c_black);
+    for (var _dx = -1; _dx <= 1; _dx++)
+        for (var _dy = -1; _dy <= 1; _dy++)
+            if (_dx != 0 || _dy != 0) draw_text(_x + _dx, _y + _dy, _text);
+    draw_set_color(c_white);
+    draw_text(_x, _y, _text);
+    draw_set_color(_oldColor);
+    draw_set_alpha(_oldAlpha);
+}
+""");
+cardContrastGroup.Import();
+
+// Campanella 2 NPC dialogue: the original physical text widths are 192px
+// (shop) and 160px (side). Center the visible substring by its real width.
+FixLayout("gml_Object_o38_NPC_Draw_0",
+    "var _x = (camera_get_view_x(view_get_camera(0)) + 192) - (floor(chrNum[ii] * 0.5) * 8);",
+    "var _x = (camera_get_view_x(view_get_camera(0)) + 192) - ((global.language == global.LANG_JAPANESE) ? string_width(stPart[ii]) * 0.5 : floor(chrNum[ii] * 0.5) * 8);");
+FixLayout("gml_Object_o38_NPC_Draw_0", "var _y = y + 88 + (8 * i);",
+    "var _npcLineStep = (global.language == global.LANG_JAPANESE) ? max(8, ceil(string_height(\"中\"))) : 8;\n            var _y = y + 88 + (_npcLineStep * i);");
+FixLayout("gml_Object_o38_NPC_Draw_0", "var _x = (x + 144) - (floor(chrNum[i] * 0.5) * 8);",
+    "var _x = (x + 144) - ((global.language == global.LANG_JAPANESE) ? string_width(stPart[i]) * 0.5 : floor(chrNum[i] * 0.5) * 8);");
+FixLayout("gml_Object_o38_NPC_Draw_0", "var _y = y + 72 + (8 * i);",
+    "var _npcLineStep = (global.language == global.LANG_JAPANESE) ? max(8, ceil(string_height(\"中\"))) : 8;\n        var _y = y + 72 + (_npcLineStep * i);");
+
 foreach (var counter in new[] {
     new { Position = "viewx + 320, viewy + 200", Template = "0:00:00", Value = "string_format(hours, 1, 0) + \":\" + string_format(minutes, 2, 0) + \":\" + string_format(seconds, 2, 0)" },
     new { Position = "viewx + 352, viewy + 64 + (24 * i)", Template = "00", Value = "string_format(resources[i] - resDelta[i], 2, 0)" }
@@ -1441,6 +1520,25 @@ foreach (var row in new[] { new { Y = 400, Key = "speed", I = 0 }, new { Y = 408
         $"+ 192, {row.Y}, \"{row.Key}\",",
         $"+ 192, _statTop + ({row.I} * _statStep), \"{row.Key}\",");
 }
+// 坎帕内拉 3 的 48×32 小挑战屏幕：保留数字行，按实际中文高度分开标签。
+FixLayout("gml_Object_o08_mg_Mas_Draw_0", "draw_text_centered(centerX, centerY + 8, scrString(",
+    "draw_text_centered(centerX, centerY + ((global.language == global.LANG_JAPANESE) ? max(8, ceil(string_height(\"中\"))) : 8), scrString(");
+FixLayout("gml_Object_o08_mg_Mas_Draw_0", "draw_text_centered(centerX, centerY, scrString(\"mg_score\"), 8);",
+    "draw_text_centered(centerX, centerY + ((global.language == global.LANG_JAPANESE) ? max(0, ceil(string_height(\"中\")) - 8) : 0), scrString(\"mg_score\"), 8);");
+FixLayout("gml_Object_o08_mg_Mas_Draw_0", "draw_text_centered(centerX, centerY, \"  ",
+    "draw_text_centered(centerX, centerY + ((global.language == global.LANG_JAPANESE) ? max(0, ceil(string_height(\"中\")) - 8) : 0), \"  ");
+FixLayout("gml_Object_o08_mg_Mas_Draw_0", "centerY + 16, c_black, c_black, c_black, c_black, 0);",
+    "centerY + ((global.language == global.LANG_JAPANESE) ? 2 * max(8, ceil(string_height(\"中\"))) : 16), c_black, c_black, c_black, c_black, 0);");
+
+// 弹球高尔夫的结果表头：编号和洞名保持独立两行。
+FixLayout("gml_Object_o23_Mas_Draw_0", "draw_text(xs + 24, ys + 16, _stageName);",
+    "draw_text(xs + 24, ys + 8 + ((global.language == global.LANG_JAPANESE) ? max(8, ceil(string_height(\"中\"))) : 8), _stageName);");
+// 点阵遮罩为原版大字体设计；中文祝贺语在遮罩之后绘制。
+FixLayout("gml_Object_o23_Mas_Draw_0", "scrStringDrawCenter(\"congrats\", _xview, _yview + 16, 20, 384);",
+    "if (global.language != global.LANG_JAPANESE) scrStringDrawCenter(\"congrats\", _xview, _yview + 16, 20, 384);");
+FixLayout("gml_Object_o23_Mas_Draw_0", "draw_sprite(s23_DMgrid, 0, _xview + 320, _yview);",
+    "draw_sprite(s23_DMgrid, 0, _xview + 320, _yview);\n    if (global.language == global.LANG_JAPANESE) scrStringDrawCenter(\"congrats\", _xview, _yview + 16, 20, 384);");
+
 var statGroup = new UndertaleModLib.Compiler.CodeImportGroup(Data);
 statGroup.ThrowOnNoOpFindReplace = true;
 foreach (var row in new[] { new { Y = 403, I = 0 }, new { Y = 411, I = 1 }, new { Y = 419, I = 2 } })
@@ -1495,6 +1593,121 @@ actionMeterGroup.QueueRegexFindReplace(Data.Code.ByName("gml_Object_o20_Game_Dra
     @"(draw_sprite\(s20_ActionMeter, [01], 8 \+ \(8 \* i\)), 88\);",
     "$1, ((global.language == global.LANG_JAPANESE) ? 92 : 88));", true);
 actionMeterGroup.Import();
+
+// Grimstone shop: preserve complete stat IDs instead of ambiguous one/two-letter labels.
+FixLayout("gml_Object_o12__Game_Draw_0", """
+                        if (n < 0)
+                        {
+                            draw_set_colour(#E03C32);
+                            draw_text(viewx + 280 + 48, viewy + 64 + 24 + (16 * j), string(n));
+                        }
+                        else
+                        {
+                            draw_set_colour(#63B31D);
+                            draw_text(viewx + 280 + 48, viewy + 64 + 24 + (16 * j), "+" + string(n));
+                        }
+                        if (abs(n) > 9)
+                        {
+                            if (isWeapon)
+                            {
+                                draw_text(viewx + 280 + 48 + 24, viewy + 64 + 24 + (16 * j), scrString("stat_atk_shortest"));
+                            }
+                            else if (isNecklace)
+                            {
+                                draw_text(viewx + 280 + 48 + 24, viewy + 64 + 24 + (16 * j), scrString("stat_evd_shortest"));
+                            }
+                            else if (isArmor)
+                            {
+                                draw_text(viewx + 280 + 48 + 24, viewy + 64 + 24 + (16 * j), scrString("stat_def_shortest"));
+                            }
+                            else if (isShoes)
+                            {
+                                draw_text(viewx + 280 + 48 + 24, viewy + 64 + 24 + (16 * j), scrString("stat_spd_shortest"));
+                            }
+                        }
+                        else if (isWeapon)
+                        {
+                            draw_text(viewx + 280 + 48 + 16, viewy + 64 + 24 + (16 * j), scrString("stat_atk_short"));
+                        }
+                        else if (isNecklace)
+                        {
+                            draw_text(viewx + 280 + 48 + 16, viewy + 64 + 24 + (16 * j), scrString("stat_evd_short"));
+                        }
+                        else if (isArmor)
+                        {
+                            draw_text(viewx + 280 + 48 + 16, viewy + 64 + 24 + (16 * j), scrString("stat_def_short"));
+                        }
+                        else if (isShoes)
+                        {
+                            draw_text(viewx + 280 + 48 + 16, viewy + 64 + 24 + (16 * j), scrString("stat_spd_short"));
+                        }
+""", """
+                        if (global.language == global.LANG_JAPANESE)
+                        {
+                            // Full stat identifiers share the original 8px grid with the delta.
+                            // Right alignment leaves room for the longest three-character name.
+                            var _statAbbrev = "SPD";
+                            if (isWeapon) _statAbbrev = "ATK";
+                            else if (isNecklace) _statAbbrev = "EVD";
+                            else if (isArmor) _statAbbrev = "DEF";
+                            var _deltaText = ((n > 0) ? "+" : "") + string(n) + _statAbbrev;
+                            var _statFont = draw_get_font();
+                            draw_set_font(global.fontGrimstone);
+                            draw_set_halign(fa_right);
+                            draw_set_colour((n < 0) ? #E03C32 : #63B31D);
+                            draw_text(viewx + 368, viewy + 88 + (16 * j), _deltaText);
+                            draw_set_halign(fa_left);
+                            draw_set_font(_statFont);
+                        }
+                        else
+                        {
+                        if (n < 0)
+                        {
+                            draw_set_colour(#E03C32);
+                            draw_text(viewx + 280 + 48, viewy + 64 + 24 + (16 * j), string(n));
+                        }
+                        else
+                        {
+                            draw_set_colour(#63B31D);
+                            draw_text(viewx + 280 + 48, viewy + 64 + 24 + (16 * j), "+" + string(n));
+                        }
+                        if (abs(n) > 9)
+                        {
+                            if (isWeapon)
+                            {
+                                draw_text(viewx + 280 + 48 + 24, viewy + 64 + 24 + (16 * j), scrString("stat_atk_shortest"));
+                            }
+                            else if (isNecklace)
+                            {
+                                draw_text(viewx + 280 + 48 + 24, viewy + 64 + 24 + (16 * j), scrString("stat_evd_shortest"));
+                            }
+                            else if (isArmor)
+                            {
+                                draw_text(viewx + 280 + 48 + 24, viewy + 64 + 24 + (16 * j), scrString("stat_def_shortest"));
+                            }
+                            else if (isShoes)
+                            {
+                                draw_text(viewx + 280 + 48 + 24, viewy + 64 + 24 + (16 * j), scrString("stat_spd_shortest"));
+                            }
+                        }
+                        else if (isWeapon)
+                        {
+                            draw_text(viewx + 280 + 48 + 16, viewy + 64 + 24 + (16 * j), scrString("stat_atk_short"));
+                        }
+                        else if (isNecklace)
+                        {
+                            draw_text(viewx + 280 + 48 + 16, viewy + 64 + 24 + (16 * j), scrString("stat_evd_short"));
+                        }
+                        else if (isArmor)
+                        {
+                            draw_text(viewx + 280 + 48 + 16, viewy + 64 + 24 + (16 * j), scrString("stat_def_short"));
+                        }
+                        else if (isShoes)
+                        {
+                            draw_text(viewx + 280 + 48 + 16, viewy + 64 + 24 + (16 * j), scrString("stat_spd_short"));
+                        }
+                        }
+""");
 
 // 罗刹的标签使用中文，分数和倒计时保留原版数字字形。
 FixLayout("gml_Object_o24_Mas_Draw_0",
@@ -1746,7 +1959,9 @@ if (chsDrawText == null || chsDrawTextExt == null || chsDrawTextColor == null ||
 
 var chsMaskedCounter = Data.Code.ByName("gml_GlobalScript_UFO50_CHS_draw_masked_counter");
 if (chsMaskedCounter == null) throw new System.Exception("Missing original-font masked counter.");
-var wrapperCodes = new HashSet<UndertaleCode>() { chsDrawText, chsDrawTextExt, chsDrawTextColor, chsAvianosMixed, chsMaskedCounter };
+var chsCardText = Data.Code.ByName("gml_GlobalScript_UFO50_CHS_draw_card_text");
+if (chsCardText == null) throw new System.Exception("Missing outlined card text helper.");
+var wrapperCodes = new HashSet<UndertaleCode>() { chsDrawText, chsDrawTextExt, chsDrawTextColor, chsAvianosMixed, chsMaskedCounter, chsCardText };
 var redirectedCalls = new Dictionary<string, int>()
 {
     { "draw_text", 0 },
