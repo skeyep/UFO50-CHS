@@ -73,7 +73,7 @@ function scrSetFont(arg0)
     {
         if (_font != global.fontDefault_CHS) global.chsRequestedFont = _font;
         var _spriteDigits = (_font == global.fontDigital || _font == global.fontDigitalMini || _font == global.fontDigitalBig || _font == global.fontDigital2);
-        if (global.language == global.LANG_JAPANESE && font_exists(global.fontDefault_CHS) && !_spriteDigits)
+        if (global.language == global.LANG_JAPANESE && font_exists(global.fontDefault_CHS) && !_spriteDigits && _font != global.fontAlien)
         {
             // 墙钟和比分牌沿用原版数字精灵的尺寸，其余文字使用中文字体。
             _font = global.fontDefault_CHS;
@@ -323,7 +323,7 @@ var drawTextInputMeasureNew = """
             else
             {
                 var charWidth = 8;
-                if (global.language == global.LANG_JAPANESE && ord(char) >= 12288)
+                if (global.language == global.LANG_JAPANESE && ord(char) > 127)
                 {
                     charWidth = cjkCellWidth;
                 }
@@ -342,7 +342,7 @@ var drawTextInputGlyphNew = """
         {
             draw_text(xx, yy, char);
             var charWidth = 8;
-            if (global.language == global.LANG_JAPANESE && ord(char) >= 12288)
+            if (global.language == global.LANG_JAPANESE && ord(char) > 127)
             {
                 charWidth = cjkCellWidth;
             }
@@ -354,7 +354,7 @@ var textWithSpritesAdvance = """
 """.Replace("\r\n", "\n");
 var textWithSpritesAdvanceNew = """
         var charWidth = 8;
-        if (global.language == global.LANG_JAPANESE && global.currFont == global.fontDefault_CHS && ord(cc) >= 12288)
+        if (global.language == global.LANG_JAPANESE && global.currFont == global.fontDefault_CHS && ord(cc) > 127)
         {
             charWidth = max(8, round(string_width(cc)));
         }
@@ -634,7 +634,7 @@ function string_line_breaks(arg0, arg1, arg2)
                     for (var _part = 1; _part <= string_length(_char); _part++)
                     {
                         var _glyph = string_char_at(_char, _part);
-                        _tokenWidth += (ord(_glyph) >= 12288) ? string_width(_glyph) : 8;
+                        _tokenWidth += (ord(_glyph) > 127) ? string_width(_glyph) : 8;
                     }
                 }
             }
@@ -1031,7 +1031,7 @@ function UFO50_CHS_draw_text(arg0, arg1, arg2)
     var _numberFont = UFO50_CHS_number_font(arg2);
     if (_numberFont >= 0) draw_set_font(_numberFont);
     var _spriteDigits = (_font == global.fontDigital || _font == global.fontDigitalMini || _font == global.fontDigitalBig || _font == global.fontDigital2);
-    if (global.language == global.LANG_JAPANESE && !_spriteDigits && _numberFont < 0)
+    if (global.language == global.LANG_JAPANESE && _font != global.fontAlien && !_spriteDigits && _numberFont < 0)
         arg1 -= 1;
     if (_numberFont < 0 && UFO50_CHS_outline_enabled() && draw_get_color() != c_black)
     {
@@ -1238,7 +1238,7 @@ function UFO50_CHS_draw_text_ext(arg0, arg1, arg2, arg3, arg4)
     var _numberFont = UFO50_CHS_number_font(arg2);
     if (_numberFont >= 0) draw_set_font(_numberFont);
     var _spriteDigits = (_font == global.fontDigital || _font == global.fontDigitalMini || _font == global.fontDigitalBig || _font == global.fontDigital2);
-    if (global.language == global.LANG_JAPANESE && !_spriteDigits && _numberFont < 0)
+    if (global.language == global.LANG_JAPANESE && _font != global.fontAlien && !_spriteDigits && _numberFont < 0)
     {
         arg1 -= 1;
         arg2 = UFO50_CHS_wrap_text(arg2, arg4);
@@ -1266,7 +1266,7 @@ function UFO50_CHS_draw_text_color(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg
     var _numberFont = UFO50_CHS_number_font(arg2);
     if (_numberFont >= 0) draw_set_font(_numberFont);
     var _spriteDigits = (_font == global.fontDigital || _font == global.fontDigitalMini || _font == global.fontDigitalBig || _font == global.fontDigital2);
-    if (global.language == global.LANG_JAPANESE && !_spriteDigits && _numberFont < 0)
+    if (global.language == global.LANG_JAPANESE && _font != global.fontAlien && !_spriteDigits && _numberFont < 0)
         arg1 -= 1;
     if (_numberFont < 0 && UFO50_CHS_outline_enabled()
         && (arg3 != c_black || arg4 != c_black || arg5 != c_black || arg6 != c_black))
@@ -3822,7 +3822,7 @@ FixLayout("gml_Object_o02_Game_Draw_0", "draw_text_ce(192, 96, challengeString, 
 // Keep original scrDrawTextInput typewriter, input tokens, width and state action.
 FixLayout("gml_GlobalScript_scrDrawTextInput",
     "draw_text(xx, yy + _libraryLabelDelta, char);",
-    "var _overboldLabelDelta = (global.language == global.LANG_JAPANESE && ord(char) >= 12288 && variable_global_exists(\"chsOverboldGearLabelDelta\")) ? global.chsOverboldGearLabelDelta : 0;\n            draw_text(xx, yy + _libraryLabelDelta + _overboldLabelDelta, char);");
+    "var _overboldLabelDelta = (global.language == global.LANG_JAPANESE && ord(char) > 127 && variable_global_exists(\"chsOverboldGearLabelDelta\")) ? global.chsOverboldGearLabelDelta : 0;\n            draw_text(xx, yy + _libraryLabelDelta + _overboldLabelDelta, char);");
 FixLayout("gml_Object_o30_Game_Draw_0",
     "scrDrawTextInput(MESSAGE_LEFT, MESSAGE_TOP, msg, controller - 1, 0, false);",
     "if (global.language == global.LANG_JAPANESE && (textMessageFull == scrString(\"gear_deflect_desc_1\") || textMessageFull == scrString(\"gear_deflect_desc_2\")))\n    {\n        var _oldGearLabelDelta = variable_global_exists(\"chsOverboldGearLabelDelta\") ? global.chsOverboldGearLabelDelta : 0;\n        global.chsOverboldGearLabelDelta = -2;\n        scrDrawTextInput(MESSAGE_LEFT, MESSAGE_TOP, msg, controller - 1, 0, false);\n        global.chsOverboldGearLabelDelta = _oldGearLabelDelta;\n    }\n    else scrDrawTextInput(MESSAGE_LEFT, MESSAGE_TOP, msg, controller - 1, 0, false);");
@@ -3918,6 +3918,688 @@ draw_text_ce(192 + titleX, 112 + titleY, scrStringManual("title_credits_2", 0), 
 """, """
 if(global.language==global.LANG_JAPANESE) UFO50_CHS_draw_fixed_ascii(192+titleX,112+titleY,string_even(scrStringManual("title_credits_2",0),3),0,true); else draw_text_ce(192 + titleX, 112 + titleY, scrStringManual("title_credits_2", 0), 4);
 """);
+
+
+// Player issues #5-#7: semantic glyphs and cursor-owned menu columns.
+var feedbackHelpers = new CodeImportGroup(Data);
+feedbackHelpers.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_grim_battle_row", """
+function UFO50_CHS_draw_grim_battle_row(_x,_y,_key) {
+    var _text=scrString(_key);
+    if(global.language!=global.LANG_JAPANESE) { draw_text(_x,_y,_text); return; }
+    // Spaces/pad glyphs separate semantic options; the navigation owns 80px columns.
+    var _words=[]; var _word="";
+    for(var _i=1;_i<=string_length(_text)+1;_i++) {
+        var _ch=_i<=string_length(_text)?string_char_at(_text,_i):" ";
+        if(_ch==" " || _ch=="☐") {
+            if(_word!="") { _words[array_length(_words)]=_word; _word=""; }
+        } else _word+=_ch;
+    }
+    for(var _i=0;_i<array_length(_words);_i++) draw_text(_x+80*_i,_y,_words[_i]);
+}
+""");
+feedbackHelpers.QueueReplace("gml_GlobalScript_UFO50_CHS_grim_item_layout", """
+function UFO50_CHS_grim_item_layout(_item) {
+    var _name=scr12_ItemGetName(_item);
+    var _icon="";
+    if(string_length(_item)>=2 && string_char_at(_item,2)==" " && string_pos(string_char_at(_item,1),"abcdefghijk")>0) _icon=string_char_at(_item,1);
+    // Chinese translations keep semantic names; icon identity comes from the stored ID.
+    // Preserve the original 8px glyph plus 8px separator, not a new CJK space.
+    return {name:_name, icon:_icon, prefix:(_icon!=""?16:0), width:string_width(_name)+(_icon!=""?16:0)};
+}
+""");
+feedbackHelpers.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_grim_item", """
+function UFO50_CHS_draw_grim_item(_x,_y,_item) {
+    if(global.language!=global.LANG_JAPANESE) { draw_text(_x,_y,scr12_ItemGetName(_item)); return; }
+    var _font=draw_get_font(); var _ha=draw_get_halign();
+    var _layout=UFO50_CHS_grim_item_layout(_item);
+    if(_ha==fa_center) _x-=floor(_layout.width/2);
+    else if(_ha==fa_right) _x-=_layout.width;
+    draw_set_halign(fa_left);
+    if(_layout.icon!="") {
+        draw_set_font(global.fontGrimstone);
+        // Top-level draw_text will be redirected. +1 cancels the CJK wrapper Y correction
+        // for this native icon; currentIsCHS is false so the CJK outline stays disabled.
+        draw_text(_x,_y+1,_layout.icon);
+    }
+    draw_set_font(_font);
+    draw_text(_x+_layout.prefix,_y,_layout.name);
+    draw_set_halign(_ha);
+}
+""");
+feedbackHelpers.QueueReplace("gml_GlobalScript_UFO50_CHS_48_begin_cipher", """
+function UFO50_CHS_48_begin_cipher(_isMeta)
+{
+    var _alien = _isMeta || (verify(speaker) && messageLanguage == LANG_ALIEN && !translateOn);
+    chs48CipherMessage = global.language == global.LANG_JAPANESE && _alien;
+    if (!chs48CipherMessage) return -1;
+    if (!variable_global_exists("chs48CipherOriginal")) {
+        var _file = string_replace(global.EXTERNAL_TEXT_FILE, "*", "48");
+        _file = string_replace(_file, "#", global.LANG_HEADERS[global.LANG_ENGLISH]);
+        var _buffer = buffer_load(_file);
+        var _content = buffer_read(_buffer, buffer_string);
+        buffer_delete(_buffer);
+        if (global.decoding[48] == 1) _content = base64_decode(_content);
+        global.chs48CipherOriginal = json_parse(_content);
+    }
+    var _state = { language: global.language, text: global.TEXT_GAME[48], font: draw_get_font(), current: global.currFont, requested: global.chsRequestedFont };
+    // The original English string and original8px wrapping generate cipher glyphs.
+    global.TEXT_GAME[48] = global.chs48CipherOriginal;
+    global.language = global.LANG_ENGLISH;
+    draw_set_font(global.fontAlien);
+    global.currFont = global.fontAlien;
+    global.chsRequestedFont = global.fontAlien;
+    return _state;
+}
+""");
+feedbackHelpers.QueueReplace("gml_GlobalScript_UFO50_CHS_48_end_cipher", """
+function UFO50_CHS_48_end_cipher(_state)
+{
+    if (is_real(_state)) return;
+    global.language = _state.language;
+    global.TEXT_GAME[48] = _state.text;
+    if (font_exists(_state.font)) draw_set_font(_state.font);
+    global.currFont = _state.current;
+    global.chsRequestedFont = _state.requested;
+}
+""");
+feedbackHelpers.QueueReplace("gml_GlobalScript_scr48_MessageLocal", """
+function scr48_MessageLocal(arg0, arg1)
+{
+    var _chsCipherState = UFO50_CHS_48_begin_cipher(arg0 == "meta");
+    var str;
+    if (arg0 == "meta")
+    {
+        str = chs48CipherMessage ? "MEESHA DANRY IS MY HERO." : scrStringManual("game_meta_message_48", 0);
+    }
+    else
+    {
+        str = scrStringExt(arg0, arg1, MESSAGE_MAX, 0);
+    }
+    scrMessageSet(str);
+    scrMessageInsertBreaks(MESSAGE_LINE_LENGTH * 8);
+    UFO50_CHS_48_end_cipher(_chsCipherState);
+}
+""");
+feedbackHelpers.QueueReplace("gml_GlobalScript_scr48_MessageLocalClue", """
+function scr48_MessageLocalClue(arg0)
+{
+    var _chsCipherState = UFO50_CHS_48_begin_cipher(false);
+    if (arg0 == 1)
+    {
+        var xDiff = obscureH - pX;
+        var yDiff = obscureK - pY;
+        var xMessage;
+        if (xDiff < 0)
+        {
+            if (abs(xDiff) == 1)
+            {
+                xMessage = scrStringVal("secret_west_singular", abs(xDiff));
+            }
+            else
+            {
+                xMessage = scrStringVal("secret_west_plural", abs(xDiff));
+            }
+        }
+        else if (abs(xDiff) == 1)
+        {
+            xMessage = scrStringVal("secret_east_singular", abs(xDiff));
+        }
+        else
+        {
+            xMessage = scrStringVal("secret_east_plural", abs(xDiff));
+        }
+        var yMessage;
+        if (yDiff < 0)
+        {
+            if (abs(yDiff) == 1)
+            {
+                yMessage = scrStringVal("secret_north_singular", abs(yDiff));
+            }
+            else
+            {
+                yMessage = scrStringVal("secret_north_plural", abs(yDiff));
+            }
+        }
+        else if (abs(yDiff) == 1)
+        {
+            yMessage = scrStringVal("secret_south_singular", abs(yDiff));
+        }
+        else
+        {
+            yMessage = scrStringVal("secret_south_plural", abs(yDiff));
+        }
+        var dirMessage;
+        if (xDiff != 0 && yDiff != 0)
+        {
+            dirMessage = scrStringVal("secret_2step", xMessage, yMessage);
+        }
+        else if (xDiff != 0)
+        {
+            dirMessage = scrStringVal("secret_1step", xMessage);
+        }
+        else
+        {
+            dirMessage = scrStringVal("secret_1step", yMessage);
+        }
+        scrMessageSet(dirMessage);
+        scrMessageInsertBreaks(MESSAGE_LINE_LENGTH * 8);
+    }
+    if (arg0 == 2)
+    {
+        var str = scrStringExt(clueMessage, "*", MESSAGE_MAX, 0);
+        scrMessageSet(str);
+        scrMessageInsertBreaks(MESSAGE_LINE_LENGTH * 8);
+    }
+    UFO50_CHS_48_end_cipher(_chsCipherState);
+}
+""");
+feedbackHelpers.Import();
+// Insert helpers.gml function definitions via CodeImportGroup before final redirect pass.
+// This candidate is not applied to the public patch.
+foreach(var key in new[]{"battle_menu_01","battle_menu_02"})
+    FixLayout("gml_Object_o12__Game_Draw_0",
+        "draw_text(viewx + 30, (viewyBot - 44) + 8, scrString(\""+key+"\"));",
+        "UFO50_CHS_draw_grim_battle_row(viewx + 30, (viewyBot - 44) + 8, \""+key+"\");");
+FixLayout("gml_Object_o12__Game_Draw_0",
+    "draw_text(viewx + 30, (viewyBot - 44) + 24, scrString(\"battle_menu_03\"));",
+    "UFO50_CHS_draw_grim_battle_row(viewx + 30, (viewyBot - 44) + 24, \"battle_menu_03\");");
+FixLayout("gml_GlobalScript_scr12_BattleMoveNext",
+    "scrStringVal(\"battle_player_reload\", player.name, player.rightHand)",
+    "scrStringVal(\"battle_player_reload\", player.name, (global.language == global.LANG_JAPANESE) ? scr12_ItemGetName(player.rightHand) : player.rightHand)");
+// 14 matches in baseline. Verify total before import.
+var grimDrawCode=Data.Code.ByName("gml_Object_o12__Game_Draw_0");
+var grimDrawSource=GetDecompiledText(grimDrawCode,new UndertaleModLib.Decompiler.GlobalDecompileContext(Data));
+var itemPattern=@"(?<!\w)draw_text\(([^;\n]*?),\s*([^;\n]*?),\s*scr12_ItemGetName\(([^;\n]*)\)\);";
+if(System.Text.RegularExpressions.Regex.Matches(grimDrawSource,itemPattern).Count!=14)
+    throw new System.Exception("Issue5 expects 14 Grimstone item draw calls");
+var grimItems=new UndertaleModLib.Compiler.CodeImportGroup(Data);
+grimItems.ThrowOnNoOpFindReplace=true;
+grimItems.QueueRegexFindReplace(grimDrawCode,itemPattern,"UFO50_CHS_draw_grim_item($1, $2, $3);",true);
+grimItems.Import();
+FixLayout("gml_Object_o48_Game_Draw_0", "if (textMessageFull == scrStringManual(\"game_meta_message_48\", 0))", "if ((variable_instance_exists(id, \"chs48CipherMessage\") && chs48CipherMessage) || textMessageFull == scrStringManual(\"game_meta_message_48\", 0))");
+
+// Additional code-confirmed same-class risk; apply only after before screenshot.
+// oTextBox yes/no positions derive pixel width as 8*char count instead of runtime CJK width.
+FixLayout("gml_Object_oTextBox_Draw_0",
+    "var _w = 8 * max(string_length(_y), string_length(_n));",
+    "var _w = (global.language == global.LANG_JAPANESE) ? max(string_width(_y), string_width(_n)) : 8 * max(string_length(_y), string_length(_n));");
+foreach(var label in new[]{"_y","_n"})
+    FixLayout("gml_Object_oTextBox_Draw_0",
+        "round((string_length("+label+") * 8) / 2)",
+        "round(((global.language == global.LANG_JAPANESE) ? string_width("+label+") : (string_length("+label+") * 8)) / 2)");
+
+// Root must before/after verify real garage escape question and right/left navigation.
+// Keep original pointer drawing, x72 and x216 relative to camera. s39_Pointer
+// origin0,0 and opaque bbox [5,4,31,20) reaches x102 / x246 inclusive.
+// Use the English first-column anchor108 and second-column252: 5 empty pixels.
+FixLayout("gml_Object_o39__Game_Step_0", "str2 = \"        はい          いいえ\";",
+    "str2 = scrString(\"yesno\");");
+FixLayout("gml_Object_o39__Game_Draw_0",
+    "        draw_text(camera_get_view_x(view_get_camera(0)) + 12, ((camera_get_view_y(view_get_camera(0)) + 216) - 64) + 12 + 14, str2);",
+    "        draw_text(camera_get_view_x(view_get_camera(0)) + 108, camera_get_view_y(view_get_camera(0)) + 180, scrStringManual(\"option_yes\", 0));\n        draw_text(camera_get_view_x(view_get_camera(0)) + 252, camera_get_view_y(view_get_camera(0)) + 180, scrStringManual(\"option_no\", 0));");
+
+
+// Root must reproduce trophies beside translated names in both Draft and Build Team.
+// Sprite stays on its original Y; text width uses current Tall/CHS request.
+FixLayout("gml_Object_o43_Game_Draw_0",
+    "draw_sprite(s43_TrophyIcon, 0, 112 + (8 * string_length(chars[draftOptions[draftX]][NAME])), 32);",
+    "draw_sprite(s43_TrophyIcon, 0, 112 + ((global.language == global.LANG_JAPANESE) ? string_width(chars[draftOptions[draftX]][NAME]) : 8 * string_length(chars[draftOptions[draftX]][NAME])), 32);");
+FixLayout("gml_Object_o43_Game_Draw_0",
+    "draw_sprite(s43_TrophyIcon, 0, 16 + xShift + (8 * string_length(chars[draftOptions[draftPos]][NAME])), 32);",
+    "draw_sprite(s43_TrophyIcon, 0, 16 + xShift + ((global.language == global.LANG_JAPANESE) ? string_width(chars[draftOptions[draftPos]][NAME]) : 8 * string_length(chars[draftOptions[draftPos]][NAME])), 32);");
+
+// ID48 trade choices: native 8px stepping overlaps Zpix11px glyphs.
+// Measure the current Chinese label height; two rows use height+3px.
+// Grow the panel upwards; its bottom stays viewy+216-BORDER_BOTTOM.
+// Native English/unreadable-alien paths retain their original panel and coordinates.
+FixLayout("gml_Object_o48_Game_Draw_0", """
+    var yHeight;
+    if (messageChoice)
+    {
+        yHeight = 80;
+    }
+""", """
+    var _chsTradeChoice = global.language == global.LANG_JAPANESE && messageChoice && !iconsHidden;
+    var _choiceHeight = _chsTradeChoice ? max(8,ceil(max(string_height(scrString("yes")),string_height(scrString("no"))))) : 8;
+    var _choiceStep = _chsTradeChoice ? max(14,_choiceHeight+3) : 8;
+    var _choiceFirst = _chsTradeChoice ? 52 : 56;
+    var yHeight;
+    if (messageChoice)
+    {
+        yHeight = _chsTradeChoice ? max(80,8+_choiceFirst+_choiceStep+_choiceHeight+3) : 80;
+    }
+""");
+FixLayout("gml_Object_o48_Game_Draw_0", """
+        scrStringDraw(xLeft + 136, yTopText + 56, "yes");
+        scrStringDraw(xLeft + 136, yTopText + 64, "no");
+        draw_text(xLeft + 120, yTopText + 56 + (8 * messageY), ">");
+""", """
+        scrStringDraw(xLeft + 136, yTopText + _choiceFirst, "yes");
+        scrStringDraw(xLeft + 136, yTopText + _choiceFirst + _choiceStep, "no");
+        if (_chsTradeChoice) UFO50_CHS_draw_fixed_ascii(xLeft + 120, yTopText + _choiceFirst + (_choiceStep * messageY), ">", 0, false);
+        else draw_text(xLeft + 120, yTopText + 56 + (8 * messageY), ">");
+""");
+
+// Before screenshots confirm shop rows/hint lines overlap in Zpix.
+// Prices stay in their native X96 column and use the existing numeric-font route.
+// Selector and item labels share the same measured row origin/step.
+FixLayout("gml_Object_o40_Shop_Draw_0", """
+if (state == 2)
+{
+""", """
+if (state == 2)
+{
+    var _chsShop = global.language == global.LANG_JAPANESE;
+    var _shopGlyphHeight = _chsShop ? max(8,ceil(string_height("中"))) : 8;
+    var _shopStep = _chsShop ? max(14,_shopGlyphHeight+3) : 8;
+    var _shopExitY = _chsShop ? max(80,40+itemCount*_shopStep) : 80;
+    var _shopPanelHeight = _chsShop ? max(64,_shopExitY-32+_shopGlyphHeight+7) : 64;
+""");
+FixLayout("gml_Object_o40_Shop_Draw_0", "scrDrawMenuBorder(xx, yy + 32, 128, 64);", "scrDrawMenuBorder(xx, yy + 32, 128, _shopPanelHeight);");
+FixLayout("gml_Object_o40_Shop_Draw_0", "var yD = yy + 40 + (8 * i);", "var yD = yy + 40 + (_shopStep * i);");
+FixLayout("gml_Object_o40_Shop_Draw_0", "draw_text(xx + 8, yy + 80, scrStringLimit(\"exit\", 14));", "draw_text(xx + 8, yy + _shopExitY, scrStringLimit(\"exit\", 14));");
+FixLayout("gml_Object_o40_Shop_Draw_0", "draw_sprite(s40_TextCursor, 0, xx, yy + 40 + (8 * selCurr));", "draw_sprite(s40_TextCursor, 0, xx, yy + 40 + (_shopStep * selCurr));");
+FixLayout("gml_Object_o40_Shop_Draw_0", "draw_sprite(s40_TextCursor, 0, xx, yy + 80);", "draw_sprite(s40_TextCursor, 0, xx, yy + _shopExitY);");
+
+// All ten original hint slots fit in134px at12px step: cameraY+32..166.
+// Native96px panel and8px stepping remain exact for English.
+FixLayout("gml_Object_o40_Shop_Draw_0", "scrDrawMenuBorder(xx, yy, 128, 96);", """
+var _hintStep = (global.language == global.LANG_JAPANESE) ? max(12,ceil(string_height("中"))+1) : 8;
+    var _hintHeight = (global.language == global.LANG_JAPANESE) ? max(96,8+10*_hintStep+6) : 96;
+    scrDrawMenuBorder(xx, yy, 128, _hintHeight);
+""");
+FixLayout("gml_Object_o40_Shop_Draw_0", "var yD = yy + 8 + (8 * i);", "var yD = yy + 8 + (_hintStep * i);");
+
+// Before evidence: issues-before-cursor6-chs-design16-cursor-death.
+// Keep the real retry/station input indices; text and native sprite share one row step.
+FixLayout("gml_Object_o16_Mas_Draw_0", """
+    draw_sprite(s16_GameOver, 0, _xview + 112, _yview + 32);
+    draw_sprite(s16_Pointer, 0, _xview + 120, _yview + 160 + (8 * menuSel));
+    draw_text(_xview + 136, _yview + 160, strRetrySector);
+    draw_text(_xview + 136, _yview + 168, strReturnToStation);
+""", """
+    draw_sprite(s16_GameOver, 0, _xview + 112, _yview + 32);
+    var _deathStep = (global.language == global.LANG_JAPANESE) ? max(14,ceil(string_height("中"))+3) : 8;
+    draw_sprite(s16_Pointer, 0, _xview + 120, _yview + 160 + (_deathStep * menuSel));
+    draw_text(_xview + 136, _yview + 160, strRetrySector);
+    draw_text(_xview + 136, _yview + 160 + _deathStep, strReturnToStation);
+""");
+
+// Before evidence: issues-before-cursor6-chs-design19-cursor-battle.
+// Four CHS rows use 14px, y160/174/188/202; 11px ink ends at213 inside216px.
+// The left equipment/remaining-uses and right action menu keep original X columns.
+// Every label, native icon, cursor and numeric draw shares the row origin.
+var battleDraw567 = Data.Code.ByName("gml_Object_o19_Mas_Draw_0");
+var battleSource567 = GetDecompiledText(battleDraw567, new UndertaleModLib.Decompiler.GlobalDecompileContext(Data));
+var battleStart567 = battleSource567.IndexOf("if (battleState == 0)");
+var battleEnd567 = battleSource567.IndexOf("else if (battleState < 90)", battleStart567);
+if (battleStart567 < 0 || battleEnd567 < 0) throw new System.Exception("Missing original Divers battle choice branch.");
+var battleBefore567 = battleSource567.Substring(battleStart567, battleEnd567 - battleStart567);
+var battleAfter567 = battleBefore567.Replace("var currItemType, currItemElement;",
+    "var currItemType, currItemElement;\n        var _battleStep = (global.language == global.LANG_JAPANESE) ? max(14,ceil(string_height(\"中\"))+3) : 8;")
+    .Replace("(8 * i)", "(_battleStep * i)")
+    .Replace("(8 * menuSel)", "(_battleStep * menuSel)")
+    .Replace("(8 * menuSel2)", "(_battleStep * menuSel2)");
+if (battleAfter567 == battleBefore567) throw new System.Exception("Divers battle choice layout did not change.");
+FixLayout("gml_Object_o19_Mas_Draw_0", battleBefore567, battleAfter567);
+
+// ID12 ally is selected from enemies[].name (internal ID); party/custom names keep their route.
+// Isolated candidate for SHOUT / WAVE / RALLY original-effect fixtures.
+foreach (var key in new[] { "battle_attack_up", "battle_ally_refreshed", "battle_defense_up" })
+    FixLayout("gml_GlobalScript_scr12_BattleEnemyMove",
+        "scrStringVal(\"" + key + "\", ally.name)",
+        "scrStringVal(\"" + key + "\", (global.language == global.LANG_JAPANESE) ? scr12_EnemyGetName(ally.name) : ally.name)");
+
+EnsureDataLoaded();
+
+var vaingerImports567 = new CodeImportGroup(Data);
+string VaingerRead567(string name) => name switch
+{
+"vainger-cipher-open-begin.gml" => """
+    // Preserve the damaged, unidentified terminal language and its original layout.
+    var _chs7Cipher = global.language == global.LANG_JAPANESE && stringLoad == "terminal_armory_room";
+    if (_chs7Cipher)
+    {
+        var _chs7Language = global.language;
+        var _chs7DrawFont = draw_get_font();
+        var _chs7CurrFont = global.currFont;
+        var _chs7HadRequestedFont = variable_global_exists("chsRequestedFont");
+        var _chs7RequestedFont = _chs7HadRequestedFont ? global.chsRequestedFont : -1;
+        if (!variable_global_exists("chs7CipherOriginal")) {
+            var _chs7File = string_replace(global.EXTERNAL_TEXT_FILE,"*","7");
+            _chs7File = string_replace(_chs7File,"#",global.LANG_HEADERS[global.LANG_ENGLISH]);
+            var _chs7Buffer = buffer_load(_chs7File);
+            var _chs7Content = buffer_read(_chs7Buffer,buffer_string);buffer_delete(_chs7Buffer);
+            if(global.decoding[7]==1)_chs7Content=base64_decode(_chs7Content);
+            global.chs7CipherOriginal=json_parse(_chs7Content);
+        }
+        var _chs7TextResource = global.TEXT_GAME[7];
+        global.TEXT_GAME[7] = global.chs7CipherOriginal;
+        global.language = global.LANG_ENGLISH;
+        scrSetFont(global.fontDefault);
+    }
+
+""",
+"vainger-cipher-open-end.gml" => """
+    if (_chs7Cipher)
+    {
+        _chs7Text.chsOriginalCipher = true;
+        global.TEXT_GAME[7] = _chs7TextResource;
+        global.language = _chs7Language;
+        global.currFont = _chs7CurrFont;
+        if (_chs7HadRequestedFont) global.chsRequestedFont = _chs7RequestedFont;
+        draw_set_font(_chs7DrawFont);
+    }
+
+""",
+"vainger-cipher-draw-begin.gml" => """
+var _chs7CipherDraw = variable_instance_exists(id, "chsOriginalCipher") && chsOriginalCipher && global.language == global.LANG_JAPANESE;
+if (_chs7CipherDraw)
+{
+    var _chs7DrawLanguage = global.language;
+    var _chs7SavedDrawFont = draw_get_font();
+    var _chs7SavedCurrFont = global.currFont;
+    var _chs7DrawHadRequestedFont = variable_global_exists("chsRequestedFont");
+    var _chs7SavedRequestedFont = _chs7DrawHadRequestedFont ? global.chsRequestedFont : -1;
+    global.language = global.LANG_ENGLISH;
+}
+
+""",
+"vainger-cipher-draw-end.gml" => """
+if (_chs7CipherDraw)
+{
+    global.language = _chs7DrawLanguage;
+    global.currFont = _chs7SavedCurrFont;
+    if (_chs7DrawHadRequestedFont) global.chsRequestedFont = _chs7SavedRequestedFont;
+    draw_set_font(_chs7SavedDrawFont);
+}
+
+""",
+_ => throw new System.Exception("Unknown embedded GML dependency: " + name)
+};
+string VaingerSource567(string name) {
+    var code=Data.Code.ByName(name);
+    if(code==null) throw new Exception("Missing Vainger cipher code: "+name);
+    return GetDecompiledText(code,new GlobalDecompileContext(Data));
+}
+string VaingerOnce567(string source,string anchor,string replacement) {
+    if(source.Split(new[]{anchor},StringSplitOptions.None).Length!=2)
+        throw new Exception("Vainger cipher anchor count: "+anchor);
+    return source.Replace(anchor,replacement);
+}
+var terminalName="gml_Object_o07_Terminal_Other_10";
+var terminal=VaingerSource567(terminalName);
+if(terminal.Contains("_chs7Cipher")) throw new Exception("Vainger cipher delta already applied");
+var percent="    var _percent = floor(100 *";
+terminal=VaingerOnce567(terminal,percent,VaingerRead567("vainger-cipher-open-begin.gml")+"\n"+percent);
+var drawBox="scrDrawTextBoxEx(0, 0, 384, scrDrawTextBoxGetHeight(_str, 32, 16, 3), -10, _str[0], _str[1], _str[2]);";
+terminal=VaingerOnce567(terminal,drawBox,"var _chs7Text = "+drawBox+"\n"+VaingerRead567("vainger-cipher-open-end.gml"));
+vaingerImports567.QueueReplace(Data.Code.ByName(terminalName),terminal);
+var drawName="gml_Object_oTextBox_Draw_0";
+var draw=VaingerSource567(drawName);
+var early=new Regex(@"\Aif\s*\(skipFrame\)\s*\{\s*skipFrame\s*=\s*false;\s*exit;\s*\}");
+var match=early.Match(draw);
+if(!match.Success) throw new Exception("Vainger cipher textbox skipFrame prefix changed");
+var body=draw.Substring(match.Length);
+if(Regex.IsMatch(body,@"\b(exit|return)\s*[;\(]")) throw new Exception("Vainger cipher textbox body has an early exit; inspect scope restoration");
+draw=draw.Substring(0,match.Length)+"\n"+VaingerRead567("vainger-cipher-draw-begin.gml")+body+"\n"+VaingerRead567("vainger-cipher-draw-end.gml");
+vaingerImports567.QueueReplace(Data.Code.ByName(drawName),draw);
+vaingerImports567.Import();
+
+// Independent issue567 candidate. Append before the global draw redirect pass.
+// Based on candidate-unified1: changes only confirmed ID31/Crack credit draw paths.
+
+
+var crack31Helpers="""
+function UFO50_CHS_31_reveal_layout(_lines,_width,_blankStep,_ending) {
+    var _glyphs=[],_yy=0,_step=max(12,ceil(string_height("中"))+1);
+    for(var _r=0;_r<array_length(_lines);_r++) {
+        var _text=_lines[_r],_xx=0,_begin=1;
+        var _empty=string_replace_all(string_replace_all(_text,chr(10),""),chr(13),"")=="";
+        if(_empty) {_yy+=_blankStep;continue;}
+        // Keep the source's leading-space reveal ticks, but place the final label at the right edge.
+        if(_ending && _r==array_length(_lines)-1) {
+            while(_begin<=string_length(_text) && string_char_at(_text,_begin)==" ")_begin++;
+            _xx=max(0,_width-string_width(string_copy(_text,_begin,string_length(_text))));
+        }
+        for(var _c=_begin;_c<=string_length(_text);_c++) {
+            var _char=string_char_at(_text,_c),_w=string_width(_char);
+            if(_char==chr(10) || _char==chr(13)) {_xx=0;_yy+=_step;continue;}
+            if(_xx>0 && _xx+_w>_width) {_xx=0;_yy+=_step;}
+            array_push(_glyphs,{sourceRow:_r,sourceChar:_c,text:_char,x:_xx,y:_yy,width:_w});
+            _xx+=_w;
+        }
+        _yy+=_step;
+    }
+    return {glyphs:_glyphs,height:_yy,step:_step};
+}
+
+function UFO50_CHS_31_draw_reveal(_layout,_x,_y,_sourceRow,_sourceCount) {
+    var _ha=draw_get_halign();draw_set_halign(fa_left);
+    for(var _i=0;_i<array_length(_layout.glyphs);_i++) {
+        var _g=_layout.glyphs[_i];
+        if(_g.sourceRow<_sourceRow || (_g.sourceRow==_sourceRow && _g.sourceChar<=_sourceCount))
+            UFO50_CHS_draw_text(_x+_g.x,_y+_g.y,_g.text);
+    }
+    draw_set_halign(_ha);
+}
+
+function UFO50_CHS_crack_has_cjk(_text) {
+    for(var _i=1;_i<=string_length(_text);_i++)if(ord(string_char_at(_text,_i))>=11904)return true;
+    return false;
+}
+
+function UFO50_CHS_crack_draw_original(_x,_y,_text) {
+    // Native sprite font: cancel the global CHS baseline correction for nonnumeric strings.
+    UFO50_CHS_draw_text(_x,_y+((UFO50_CHS_number_font(_text)<0)?1:0),_text);
+}
+
+function UFO50_CHS_draw_crack_localized() {
+    var _savedFont=draw_get_font(),_savedRequest=global.chsRequestedFont,_ha=draw_get_halign();
+    if(style==0) {
+        scrSetFont(global.fontCrackHeader);
+        if(!positioned){x=oLibrary.cracktroLeftX;positioned=true;}
+        var _layout=UFO50_CHS_31_reveal_layout(str,144,16,false);
+        draw_set_halign(fa_left);
+        for(var _i=0;_i<array_length(_layout.glyphs);_i++) {
+            var _g=_layout.glyphs[_i];
+            UFO50_CHS_draw_text(true_round(x+_g.x),true_round(y+_g.y+cos(wave+_g.sourceChar-1)),_g.text);
+        }
+    } else if(style==1 || style==2) {
+        var _native=(style==1)?global.fontCrackBig:global.fontCrackSmall;
+        scrSetFont(_native);draw_set_halign(fa_right);
+        if(!positioned){x=oLibrary.cracktroRightX+((style==2)?16:((gnomeID==-1)?32:0));positioned=true;}
+        var _offset=0;
+        for(var _i=0;_i<array_length(str);_i++) {
+            var _cjk=UFO50_CHS_crack_has_cjk(str[_i]);
+            if(_cjk){scrSetFont(_native);UFO50_CHS_draw_text(x,y+_offset,str[_i]);}
+            else {draw_set_font(_native);global.chsRequestedFont=_native;UFO50_CHS_crack_draw_original(x,y+_offset,str[_i]);}
+            _offset+=(style==1)?16:(_cjk?12:8);
+        }
+        if(style==1 && gnomeID>-1)draw_sprite(sCrackPortraits,gnomeID,x,y);
+    } else if(style==3) {
+        if(!positioned){x=oLibrary.cracktroLeftX;positioned=true;}
+        draw_sprite(sMossmouth,0,x,y);
+    } else if(style==4) {
+        scrSetFont(global.fontDefault);
+        if(!positioned){x=oLibrary.cracktroLeftX+80;positioned=true;}
+        var _step=max(12,ceil(string_height("中"))+1),_watermarkY=8;
+        draw_set_halign(fa_center);
+        for(var _i=0;_i<array_length(str);_i++) {
+            UFO50_CHS_draw_text(x,y+_step*_i,str[_i]);
+            if(str[_i]!="")_watermarkY=(_i+1)*_step+8;
+        }
+        draw_set_halign(fa_left);draw_set_font(global.fontCrackBig);global.chsRequestedFont=global.fontCrackBig;
+        UFO50_CHS_crack_draw_original(x-8,y+_watermarkY,"@");
+    }
+    draw_set_font(_savedFont);global.chsRequestedFont=_savedRequest;draw_set_halign(_ha);
+}
+
+""";
+var crack31Functions=Regex.Matches(crack31Helpers,@"(?m)^function (\w+)\(");
+var crack31Import=new CodeImportGroup(Data);crack31Import.AutoCreateAssets=true;
+for(var crack31i=0;crack31i<crack31Functions.Count;crack31i++) {
+    var m=crack31Functions[crack31i];
+    var end=(crack31i+1<crack31Functions.Count)?crack31Functions[crack31i+1].Index:crack31Helpers.Length;
+    crack31Import.QueueReplace("gml_GlobalScript_"+m.Groups[1].Value,crack31Helpers.Substring(m.Index,end-m.Index));
+}
+crack31Import.Import();
+FixLayout("gml_Object_o31_Mas_Draw_0", "    for (var i = 0; i < 5; i++)\n    {\n        if (i == textLine)\n        {\n            for (var j = 0; j < textCount; j++)\n            {\n                draw_text(xv + 24 + (8 * j), yv + 48 + (8 * i), string_char_at(mgText[i], j + 1));\n            }\n        }\n        else if (i < textLine)\n        {\n            draw_text(xv + 24, yv + 48 + (8 * i), mgText[i]);\n        }\n    }\n    if (subState == 1)\n    {\n        scrStringDraw(xv + 40, yv + 96, \"mg_yes\");\n        scrStringDraw(xv + 88, yv + 96, \"mg_no\");\n        draw_sprite(s31_Pointer, floor(tPointer * 0.1), xv + 32 + (mgSelect * 48), yv + 96);\n    }\n    else if (subState == 2)\n    {\n        if ((t % 6) > 2)\n        {\n            if (mgSelect == 0)\n            {\n                scrStringDraw(xv + 40, yv + 96, \"mg_yes\");\n            }\n            else\n            {\n                scrStringDraw(xv + 88, yv + 96, \"mg_no\");\n            }\n            draw_sprite(s31_Pointer, 0, xv + 32 + (mgSelect * 48), yv + 96);\n        }\n    }\n", "    if(global.language==global.LANG_JAPANESE) {\n        var _chsMenuFont=draw_get_font(),_chsMenuRequest=global.chsRequestedFont,_chsMenuColor=draw_get_color();\n        scrSetFont(global.fontDefault);\n        var _chsMenuLayout=UFO50_CHS_31_reveal_layout(mgText,96,12,false);\n        var _chsMenuGlyphHeight=max(8,ceil(string_height(\"中\")));\n        var _chsMenuTop=min(40,120-_chsMenuLayout.height-4-_chsMenuGlyphHeight-5);\n        var _chsChoiceY=_chsMenuTop+_chsMenuLayout.height+4;\n        // Expand upward and down to y119; the original decorative board starts at y120.\n        draw_set_color(c_white);draw_rectangle(xv+16,yv+_chsMenuTop-8,xv+127,yv+119,false);\n        draw_set_color(c_black);draw_rectangle(xv+20,yv+_chsMenuTop-4,xv+123,yv+115,false);\n        draw_set_color(_chsMenuColor);\n        UFO50_CHS_31_draw_reveal(_chsMenuLayout,xv+24,yv+_chsMenuTop,textLine,textCount);\n        if(subState==1 || (subState==2 && (t%6)>2)) {\n            if(subState==1 || mgSelect==0)scrStringDraw(xv+40,yv+_chsChoiceY,\"mg_yes\");\n            if(subState==1 || mgSelect==1)scrStringDraw(xv+88,yv+_chsChoiceY,\"mg_no\");\n            draw_sprite(s31_Pointer,(subState==1)?floor(tPointer*0.1):0,xv+32+mgSelect*48,yv+_chsChoiceY);\n        }\n        draw_set_font(_chsMenuFont);global.chsRequestedFont=_chsMenuRequest;\n    } else {\n    for (var i = 0; i < 5; i++)\n    {\n        if (i == textLine)\n        {\n            for (var j = 0; j < textCount; j++)\n            {\n                draw_text(xv + 24 + (8 * j), yv + 48 + (8 * i), string_char_at(mgText[i], j + 1));\n            }\n        }\n        else if (i < textLine)\n        {\n            draw_text(xv + 24, yv + 48 + (8 * i), mgText[i]);\n        }\n    }\n    if (subState == 1)\n    {\n        scrStringDraw(xv + 40, yv + 96, \"mg_yes\");\n        scrStringDraw(xv + 88, yv + 96, \"mg_no\");\n        draw_sprite(s31_Pointer, floor(tPointer * 0.1), xv + 32 + (mgSelect * 48), yv + 96);\n    }\n    else if (subState == 2)\n    {\n        if ((t % 6) > 2)\n        {\n            if (mgSelect == 0)\n            {\n                scrStringDraw(xv + 40, yv + 96, \"mg_yes\");\n            }\n            else\n            {\n                scrStringDraw(xv + 88, yv + 96, \"mg_no\");\n            }\n            draw_sprite(s31_Pointer, 0, xv + 32 + (mgSelect * 48), yv + 96);\n        }\n    }\n    }\n");
+FixLayout("gml_Object_o31_Mas_Draw_0", "        for (var i = 0; i < array_length(endText[endType]); i++)\n        {\n            if (i == textLine)\n            {\n                for (var j = 0; j < textCount; j++)\n                {\n                    draw_text(xv + 24 + (8 * j), yv + 32 + (8 * i), string_char_at(endText[endType][i], j + 1));\n                }\n            }\n            else if (i < textLine)\n            {\n                draw_text(xv + 24, yv + 32 + (8 * i), endText[endType][i]);\n            }\n        }\n", "        if(global.language==global.LANG_JAPANESE) {\n            var _chsEndFont=draw_get_font(),_chsEndRequest=global.chsRequestedFont;\n            scrSetFont(global.fontDefault);\n            var _chsEndLayout=UFO50_CHS_31_reveal_layout(endText[endType],208,6,true);\n            // Source rows and source character counts still drive the original animation/timing.\n            // Adapt the drawing origin to the full measured block; keep the right image at x256.\n            var _chsEndTop=min(32,max(8,208-_chsEndLayout.height));\n            UFO50_CHS_31_draw_reveal(_chsEndLayout,xv+24,yv+_chsEndTop,textLine,textCount);\n            draw_set_font(_chsEndFont);global.chsRequestedFont=_chsEndRequest;\n        } else {\n        for (var i = 0; i < array_length(endText[endType]); i++)\n        {\n            if (i == textLine)\n            {\n                for (var j = 0; j < textCount; j++)\n                {\n                    draw_text(xv + 24 + (8 * j), yv + 32 + (8 * i), string_char_at(endText[endType][i], j + 1));\n                }\n            }\n            else if (i < textLine)\n            {\n                draw_text(xv + 24, yv + 32 + (8 * i), endText[endType][i]);\n            }\n        }\n        }\n");
+FixLayout("gml_Object_oTextCrack_Draw_0", "if (style == 0)", "if(global.language==global.LANG_JAPANESE) { UFO50_CHS_draw_crack_localized(); exit; }\nif (style == 0)");
+FixLayout("gml_GlobalScript_scrCrackCredit", "oLibrary.cracktroHeight += (_lineHeight * numLines) + argument[2];", "if(global.language==global.LANG_JAPANESE && text.style==STYLE_DISCLAIMER)_lineHeight=12;\n    oLibrary.cracktroHeight += (_lineHeight * numLines) + argument[2];");
+
+// Candidate only. Apply after existing title spacing and A/B layout changes.
+// Keep the expanded Chinese row spacing, and anchor the final row at the native Y.
+// This snippet is applied to the Chinese candidate; the English branch retains shift zero.
+// FixLayout imports/decompiles between edits, so its anchors use normalized compiled source.
+string TitleBottomCompiledSource567() {
+    var code=Data.Code.ByName("gml_Object_oTitleScreens_Draw_0");
+    if(code==null)throw new System.Exception("Shared title Draw0 missing");
+    return GetDecompiledText(code,new UndertaleModLib.Decompiler.GlobalDecompileContext(Data));
+}
+void TitleBottomChecked567(string anchor,string replacement,int expected) {
+    var source=TitleBottomCompiledSource567();
+    int count=source.Split(new[]{anchor},System.StringSplitOptions.None).Length-1;
+    if(count!=expected)throw new System.Exception("Shared title anchor count "+count+" expected "+expected+": "+anchor);
+    FixLayout("gml_Object_oTitleScreens_Draw_0",anchor,replacement);
+}
+TitleBottomChecked567("    var _showCopyright = true;", """
+    var _chsMenuShift = 0;
+    if (global.language == global.LANG_JAPANESE && menuSelBot > 1)
+        _chsMenuShift = (max(12, ceil(string_height("中")) + 1) - 8) * menuSelBot;
+    var _showCopyright = true;
+""",1);
+// Label rows, native-language A/B branches, and SUB_SELECTED share this expression.
+TitleBottomChecked567("152 + (_lineSpacing * i)", "152 - _chsMenuShift + (_lineSpacing * i)",8);
+// Import normalizes the existing compact A/B expression; the preceding replacement covers it.
+// Native hand cursor in normal and selected states, and the intro-style arrow.
+TitleBottomChecked567("149 + (menuSel * _lineSpacing)", "149 - _chsMenuShift + (menuSel * _lineSpacing)",2);
+TitleBottomChecked567("152 + (menuSel * _lineSpacing)", "152 - _chsMenuShift + (menuSel * _lineSpacing)",1);
+var titleBottomAfter567=TitleBottomCompiledSource567();
+if(titleBottomAfter567.Split(new[]{"_chsMenuShift"},System.StringSplitOptions.None).Length-1!=13)
+    throw new System.Exception("Shared title shift must have two setup references and eleven synchronized row/cursor references");
+ScriptMessage("Shared title bottom anchor counts 1/8/2/1; synchronized shift references 13 passed.");
+
+// Root witnessed CHS title/body overlap in cursor12-avianos-2/3 before this fix.
+// Run after the existing AVIANOS mixed-font route; supports either ext call name.
+// Chinese-only miracle description panel, original EN/JP drawing block retained.
+var miraclePanelCode567 = Data.Code.ByName("gml_Object_o50_Game_Draw_0");
+var miraclePanelSource567 = GetDecompiledText(miraclePanelCode567, new GlobalDecompileContext(Data));
+var miraclePanelPattern567 = @"var mirIndex = act\.params\[subY\]\[0\];\s*draw_sprite\(s50_ActionWindow, 0, HUD_LEFT \+ hudShiftX \+ HUD_WIDTH \+ 8, \(ACTION_TOP \+ \(ACTION_HEIGHT \* actionIndex\)\) - 8\);\s*draw_sprite\(s50_Miracles, mirIndex, HUD_LEFT \+ hudShiftX \+ HUD_WIDTH \+ 16, ACTION_TOP \+ \(ACTION_HEIGHT \* actionIndex\)\);\s*draw_set_color\(global\.palette\[14\]\);\s*(?:draw_text|UFO50_CHS_draw_avianos_mixed)\(HUD_LEFT \+ hudShiftX \+ HUD_WIDTH \+ 56, ACTION_TOP \+ \(ACTION_HEIGHT \* actionIndex\), MIR_NAMES\[mirIndex\]\);\s*draw_set_color\(c_white\);\s*(?:draw_text_ext|UFO50_CHS_draw_text_ext)\(HUD_LEFT \+ hudShiftX \+ HUD_WIDTH \+ 56, ACTION_TOP \+ \(ACTION_HEIGHT \* actionIndex\) \+ 8, MIR_DESC\[mirIndex\], 8, 128\);";
+var miraclePanelMatches567 = System.Text.RegularExpressions.Regex.Matches(miraclePanelSource567, miraclePanelPattern567);
+if (miraclePanelMatches567.Count != 1)
+    throw new System.Exception("AVIANOS miracle panel anchor count != 1: " + miraclePanelMatches567.Count);
+var miraclePanelOriginal567 = miraclePanelMatches567[0].Value;
+var miraclePanelElse567 = miraclePanelOriginal567.Substring(miraclePanelOriginal567.IndexOf(';') + 1);
+var miraclePanelCHS567 = """
+var mirIndex = act.params[subY][0];
+                            if (global.language == global.LANG_JAPANESE)
+                            {
+                                // Measure and draw the same complete wrapped lines.
+                                var _mirLines = UFO50_CHS_wrap_text_array(MIR_DESC[mirIndex], 128, 0);
+                                var _mirGlyphHeight = max(12, ceil(string_height("中")));
+                                var _mirLineStep = max(14, _mirGlyphHeight + 2);
+                                var _mirTitleGap = _mirLineStep;
+                                var _mirBodyHeight = (array_length(_mirLines) - 1) * _mirLineStep + _mirGlyphHeight;
+                                var _mirSpriteWidth = sprite_get_width(s50_ActionWindow);
+                                var _mirSpriteHeight = sprite_get_height(s50_ActionWindow);
+                                var _mirPanelHeight = max(_mirSpriteHeight, ceil((16 + _mirTitleGap + _mirBodyHeight + 8) / 8) * 8);
+                                var _mirPanelLeft = HUD_LEFT + hudShiftX + HUD_WIDTH + 8;
+                                // Keep the panel above the original y200 message line.
+                                var _mirPanelTop = min(ACTION_TOP + ACTION_HEIGHT * actionIndex - 16, 200 - _mirPanelHeight);
+                                var _mirTitleY = _mirPanelTop + 16;
+                                // Original top/bottom 8px borders, stretched empty middle.
+                                draw_sprite_part_ext(s50_ActionWindow, 0, 0, 0, _mirSpriteWidth, 8, _mirPanelLeft, _mirPanelTop, 1, 1, c_white, draw_get_alpha());
+                                draw_sprite_part_ext(s50_ActionWindow, 0, 0, 8, _mirSpriteWidth, _mirSpriteHeight - 16, _mirPanelLeft, _mirPanelTop + 8, 1, (_mirPanelHeight - 16) / (_mirSpriteHeight - 16), c_white, draw_get_alpha());
+                                draw_sprite_part_ext(s50_ActionWindow, 0, 0, _mirSpriteHeight - 8, _mirSpriteWidth, 8, _mirPanelLeft, _mirPanelTop + _mirPanelHeight - 8, 1, 1, c_white, draw_get_alpha());
+                                draw_sprite(s50_Miracles, mirIndex, HUD_LEFT + hudShiftX + HUD_WIDTH + 16, _mirTitleY);
+                                draw_set_color(global.palette[14]);
+                                UFO50_CHS_draw_avianos_mixed(HUD_LEFT + hudShiftX + HUD_WIDTH + 56, _mirTitleY, MIR_NAMES[mirIndex]);
+                                draw_set_color(c_white);
+                                for (var _mirRow = 0; _mirRow < array_length(_mirLines); _mirRow++)
+                                    UFO50_CHS_draw_avianos_mixed(HUD_LEFT + hudShiftX + HUD_WIDTH + 56, _mirTitleY + _mirTitleGap + _mirRow * _mirLineStep, _mirLines[_mirRow]);
+                            }
+                            else
+                            {
+""" + miraclePanelElse567 + "\n                            }";
+var miraclePanelImports567 = new UndertaleModLib.Compiler.CodeImportGroup(Data);
+miraclePanelImports567.ThrowOnNoOpFindReplace = true;
+miraclePanelImports567.QueueFindReplace(miraclePanelCode567, miraclePanelOriginal567, miraclePanelCHS567, true);
+miraclePanelImports567.Import();
+ScriptMessage("AVIANOS CHS miracle panel: complete128px wrapped body, title/body gap>=14px, borders measured, panel bottom<=200; original other-language branch retained.");
+// Task-only candidate. Root approved after new15 real-game image review.
+// Append after base FixLayout candidates, before global draw redirect.
+// Depends on the base patch's FixLayout and existing UFO50_CHS draw helpers.
+
+
+var dust4647Helpers="""
+function UFO50_CHS_dust_title_letter(_x,_y,_name,_index) {
+    var _font=draw_get_font(),_request=global.chsRequestedFont,_current=global.currFont,_align=draw_get_halign();
+    scrSetFont(global.fontDefault);
+    draw_set_halign(fa_left);
+    // Original 8px formula places the complete block around x+16.
+    // Source character indices and the caller's vertical reveal offset remain original.
+    var _measureFont=draw_get_font(),_total=0,_prefix=0;
+    for(var _i=1;_i<=string_length(_name);_i++) {
+        var _char=string_char_at(_name,_i),_native=UFO50_CHS_number_font(_char);
+        if(_native>=0)draw_set_font(_native);
+        var _width=string_width(_char);
+        draw_set_font(_measureFont);
+        if(_i<_index)_prefix+=_width;
+        _total+=_width;
+    }
+    var _left=_x+16-floor(_total/2);
+    UFO50_CHS_draw_text(_left+_prefix,_y,string_char_at(_name,_index));
+    draw_set_font(_font);global.chsRequestedFont=_request;global.currFont=_current;draw_set_halign(_align);
+}
+
+function UFO50_CHS_46_warning_lines(_x,_y,_first,_second) {
+    var _font=draw_get_font(),_request=global.chsRequestedFont,_current=global.currFont,_align=draw_get_halign();
+    scrSetFont(global.fontDefault);
+    draw_set_halign(fa_left);
+    var _step=max(12,ceil(string_height("中"))+1);
+    UFO50_CHS_draw_text(_x,_y,_first);
+    UFO50_CHS_draw_text(_x,_y+_step,_second);
+    draw_set_font(_font);global.chsRequestedFont=_request;global.currFont=_current;draw_set_halign(_align);
+}
+
+function UFO50_CHS_47_original_credit(_x,_y,_text) {
+    var _font=draw_get_font(),_request=global.chsRequestedFont,_current=global.currFont,_align=draw_get_halign();
+    // These rows come from the unchanged English manual language slot.
+    // Reproduce original draw_text_ce(...,4): original even-padding and 8px width.
+    var _even=string_even(_text,3);
+    var _left=_x-floor(string_length(_even)*8/2);
+    draw_set_font(global.fontDefault);global.chsRequestedFont=global.fontDefault;
+    draw_set_halign(fa_left);
+    // The CHS wrapper subtracts one for nonnumeric strings; cancel that for the native font.
+    var _cancel=(UFO50_CHS_number_font(_even)<0)?1:0;
+    UFO50_CHS_draw_text(_left,_y+_cancel,_even);
+    draw_set_font(_font);global.chsRequestedFont=_request;global.currFont=_current;draw_set_halign(_align);
+}
+
+""";
+var dust4647Functions=Regex.Matches(dust4647Helpers,@"(?m)^function (\w+)\(");
+// Complete each function registration before compiling any caller.
+for(var dust4647i=0;dust4647i<dust4647Functions.Count;dust4647i++) {
+    var m=dust4647Functions[dust4647i];
+    var end=(dust4647i+1<dust4647Functions.Count)?dust4647Functions[dust4647i+1].Index:dust4647Helpers.Length;
+    var imports=new CodeImportGroup(Data);imports.AutoCreateAssets=true;
+    imports.QueueReplace("gml_GlobalScript_"+m.Groups[1].Value,dust4647Helpers.Substring(m.Index,end-m.Index));
+    imports.Import();
+}
+FixLayout("gml_Object_oIcon_Draw_0",
+    "            draw_text(((x + (8 * i)) - (4 * string_length(myName))) + 8, y - 16 - _letterYOffset, string_char_at(myName, i));",
+    "            if(global.language==global.LANG_JAPANESE) UFO50_CHS_dust_title_letter(x,y-16-_letterYOffset,myName,i);\n            else draw_text(((x + (8 * i)) - (4 * string_length(myName))) + 8, y - 16 - _letterYOffset, string_char_at(myName, i));");
+FixLayout("gml_Object_o46_Mas_Draw_0",
+    "        draw_text(_xv + 72, _yv + 16, scrString(\"boss_warning_1\"));\n        draw_text(_xv + 72, _yv + 24, scrString(\"boss_warning_2\"));",
+    "        if(global.language==global.LANG_JAPANESE) UFO50_CHS_46_warning_lines(_xv+72,_yv+16,scrString(\"boss_warning_1\"),scrString(\"boss_warning_2\"));\n        else {\n        draw_text(_xv + 72, _yv + 16, scrString(\"boss_warning_1\"));\n        draw_text(_xv + 72, _yv + 24, scrString(\"boss_warning_2\"));\n        }");
+FixLayout("gml_Object_o47_EndingCut_Draw_0",
+    "        scrStringDrawCE(textx, credity, \"credits_title\", 4);",
+    "        if(global.language==global.LANG_JAPANESE) UFO50_CHS_47_original_credit(textx,credity,scrString(\"credits_title\"));\n        else scrStringDrawCE(textx, credity, \"credits_title\", 4);");
+FixLayout("gml_Object_o47_EndingCut_Draw_0",
+    "            draw_text_ce(textx, true_round(credity + 80 + (8 * i)), scrStringManual(\"game_credits_47_\" + string(i + 1), 0), 4);",
+    "            if(global.language==global.LANG_JAPANESE) UFO50_CHS_47_original_credit(textx,true_round(credity+80+8*i),scrStringManual(\"game_credits_47_\"+string(i+1),0));\n            else draw_text_ce(textx, true_round(credity + 80 + (8 * i)), scrStringManual(\"game_credits_47_\" + string(i + 1), 0), 4);");
 
 var chsDrawText = Data.Code.ByName("gml_GlobalScript_UFO50_CHS_draw_text");
 var chsDrawTextExt = Data.Code.ByName("gml_GlobalScript_UFO50_CHS_draw_text_ext");

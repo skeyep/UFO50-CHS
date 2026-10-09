@@ -132,7 +132,7 @@
   "guin_blue_door_open": "格温：蓝色钥匙卡打开了门！",
   "guin_blue_door_locked": "格温：我需要蓝色钥匙卡。",
   "guin_hack_lights": "你熟练侵入H.A.W.K.的安保系统，关闭了设施内的探照灯和摄像头。",
-  "guin_hack_done": "系统已将你锁在外面。",
+  "guin_hack_done": "系统已禁止你继续访问。",
   "guin_octavio_terminal_1": "格温：奥克塔维奥！我需要附近前哨站里的一把安保密钥！坐标发给你了……",
   "guin_octavio_terminal_2": "奥克塔维奥：密钥已经送过去了！快去找H.A.W.K.司令！稍后会合！",
   "guin_huxley_terminal_1": "格温：赫胥黎，太迟了！他们发射了导弹！你必须把它击落！",
