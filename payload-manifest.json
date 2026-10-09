@@ -1,6 +1,6 @@
 {
-  "version": "1.0.3",
-  "generatedAt": "2026-10-09T05:53:59.7790994Z",
+  "version": "1.1.0",
+  "generatedAt": "2026-10-09T06:28:51.1029552Z",
   "files": [
     {
       "path": "Install-UFO50-CHS.cmd",
@@ -289,12 +289,12 @@
     },
     {
       "path": "README.txt",
-      "sha256": "4DB6FA2CAC24ED17E2A108D725A18268DE859832724AFDAAA15F4DCAB513D923",
+      "sha256": "9D98D7C1E3CBE68B3F7248182F4133B7EEC5212D8AD9D1A9EDDCD1FA9C1272DA",
       "size": 1579
     },
     {
       "path": "release-config.json",
-      "sha256": "DB81263F0DEBB77CD1D6D73EAED77F9D8D61216F3AB678B473A7090BA8E212FF",
+      "sha256": "C2A9381CB7296755FBF1297E2AB8DBFECC61B3585DB92CEE2B824EA40BABADC7",
       "size": 869
     },
     {
