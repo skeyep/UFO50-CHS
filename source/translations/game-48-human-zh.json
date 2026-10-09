@@ -50,7 +50,7 @@
   "merchant_success_pos": "多谢惠顾。这是你的物品。",
   "merchant_success_neg": "这就够了。拿上东西，赶紧走。",
   "merchant_soldout_pos": "抱歉，我已经没东西可卖了。",
-  "merchant_soldout_neg": "我不是已经把东西卖给你了吗？",
+  "merchant_soldout_neg": "我之前卖你的东西，你弄哪去了？",
   "game_over": "你终究没能抵挡佐尔达斯。",
   "found_all_parts": "你找齐了藏宝图的全部 * 张碎片！该回飞船了。",
   "nature_0_msg_0": "你很快就要离开这颗星球吗？请把我也带上。",

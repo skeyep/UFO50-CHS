@@ -1,6 +1,6 @@
 # UFO 50 简体中文汉化
 
-Windows Steam 版《UFO 50》的简体中文汉化补丁，最新发布版本为 **v1.0.2**。
+Windows Steam 版《UFO 50》的简体中文汉化补丁，最新发布版本为 **v1.0.3**。
 
 由 **Skeyep_目目**与 **GPT-5.6 Sol** 协作完成。
 
@@ -17,7 +17,7 @@ Windows Steam 版《UFO 50》的简体中文汉化补丁，最新发布版本为
 
 适用于 **Windows 10/11 的 Steam 版《UFO 50》**。安装包自带所需字体与工具，安装时无需联网，也无需另装运行环境。
 
-1. 前往 [下载页面](https://github.com/skeyep/UFO50-CHS/releases/latest)，下载 `UFO50-CHS-v1.0.2.zip`。
+1. 前往 [下载页面](https://github.com/skeyep/UFO50-CHS/releases/latest)，下载 `UFO50-CHS-v1.0.3.zip`。
 2. 将 ZIP 完整解压到一个文件夹。
 3. 关闭游戏，双击 `Install-UFO50-CHS.cmd`。
 4. 安装器会自动查找 Steam 游戏目录；需要手动选择时，选中包含 `ufo50.exe` 的文件夹。
