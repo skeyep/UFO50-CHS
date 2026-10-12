@@ -2,6 +2,14 @@
 
 检查顺序为静态清点、原场景运行、绘制边界记录、自动碰撞定位、放大查看、原导航和确认交互。每个选择项分别采集；画面记录保存原 PNG，模型查看使用 JPG。
 
+姓名输入同时清点 `input-caret`、`fixed-grid` 和 `implicit-draw-entry`：输入方块可能由对象默认绘制，源码里没有 `draw_sprite`。沿对象的 Create/Step、原点、缩放和闪烁帧记录实际位置；当前字符的覆盖方块与选择菜单的手形分别审阅。字符表保留原字体中的假名、空格和删除／确认图标，姓名正文与输入位置按真实字宽定位。
+
+```powershell
+py -3.14 scripts/make-name-entry-closeups.py --evidence-dir <实机证据目录> --sprite-metadata <opaque-bboxes.json>
+```
+
+工具从实际姓名、光标状态与同帧绘制记录裁出姓名和所选字符行，生成最近邻 JPG。原透明闪帧按元数据保留。与官方语言同场对照时，同时检查每行首尾格、原输入、删除、切换、确认及保存流程。
+
 `scripts/audit-layout-draws.py --code-root <原版GML目录> --output-dir <审阅目录>` 清点光标、字符数乘8、逐字／逐行固定格、相邻8px文字行与语义字体。每项保留稳定代码位点、上下文和资源键；沿原调用建立场景，检查现有补丁与实际画面后记录处理结果。
 
 `scripts/make-layout-closeups.py` 读取同帧的 `*-texts.json`、`*-sprites.json` 和原精灵的 alpha 边界，检测文字之间、文字与光标之间的矩形交叠。它按摄像机或 GUI 尺寸转换坐标，并处理文字对齐、精灵原点、缩放和旋转。结果写入 `layout-collisions.json`；交叠与选择项自动生成最近邻四倍放大的 JPG，文字框为青色、光标框为黄色、交叠为红色。

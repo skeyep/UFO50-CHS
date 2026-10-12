@@ -4931,6 +4931,60 @@ Align3542("gml_Object_o42_Game_Draw_0",
 align3542.Import();
 
 
+// Grimstone name entry: preserve the authored kana/icon grid and original input.
+var feedbackName = new CodeImportGroup(Data);
+feedbackName.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_grimstone_name_grid", """
+function UFO50_CHS_draw_grimstone_name_grid(arg0,arg1,arg2)
+{
+    var _previousFont=draw_get_font();
+    if(global.language==global.LANG_JAPANESE)draw_set_font(global.fontGrimstone);
+    draw_text(arg0,arg1,arg2);
+    draw_set_font(_previousFont);
+}
+""");
+feedbackName.Import();
+wrapperCodes.Add(Data.Code.ByName("gml_GlobalScript_UFO50_CHS_draw_grimstone_name_grid"));
+var feedbackNameDraw=Data.Code.ByName("gml_Object_o12__Game_Draw_0");
+var feedbackNameSource=GetDecompiledText(feedbackNameDraw,new GlobalDecompileContext(Data));
+var feedbackNamePattern=@"UFO50_CHS_draw_text\(([^;\n]*""[^""\n]*☐[^""\n]*"")\);";
+if(Regex.Matches(feedbackNameSource,feedbackNamePattern).Count!=12)throw new Exception("Expected twelve original Grimstone name-grid rows.");
+feedbackName.QueueReplace(feedbackNameDraw,Regex.Replace(feedbackNameSource,feedbackNamePattern,"UFO50_CHS_draw_grimstone_name_grid($1);"));
+var feedbackNameCreate=Data.Code.ByName("gml_Object_o12_NameChar_Create_0");
+feedbackName.QueueReplace(feedbackNameCreate,GetDecompiledText(feedbackNameCreate,new GlobalDecompileContext(Data))+"\norigY=y;\n");
+var feedbackNameStep=Data.Code.ByName("gml_Object_o12_NameChar_Step_0");
+feedbackName.QueueReplace(feedbackNameStep,GetDecompiledText(feedbackNameStep,new GlobalDecompileContext(Data))+"""
+
+if(global.language==global.LANG_JAPANESE)
+{
+    var _previousFont=draw_get_font();
+    draw_set_font(global.fontDefault_CHS);
+    var _name=o12__Game.party[o12__Game.currPlayer].name;
+    var _position=o12__Game.currNameChar;
+    x=origX+string_width(string_copy(_name,1,_position));
+    var _char=(_position<string_length(_name))?string_char_at(_name,_position+1):"中";
+    image_xscale=max(8,ceil(string_width(_char)))/sprite_get_width(sprite_index);
+    image_yscale=max(8,ceil(string_height("中")))/sprite_get_height(sprite_index);
+    y=origY-1;
+    draw_set_font(_previousFont);
+}
+""");
+feedbackName.Import();
+
+// Reachable fallback dialogue and moving-fireball impact bypass language JSON.
+var feedbackProse=new CodeImportGroup(Data);
+var feedbackNPC=Data.Code.ByName("gml_Object_o12_mapNPC_Create_0");
+var feedbackNPCSource=GetDecompiledText(feedbackNPC,new GlobalDecompileContext(Data));
+var feedbackGreeting="str1 = \"GREETINGS, STRANGER.\";";
+if(feedbackNPCSource.Split(new[]{feedbackGreeting},StringSplitOptions.None).Length!=2)throw new Exception("Default NPC greeting anchor changed.");
+feedbackProse.QueueReplace(feedbackNPC,feedbackNPCSource.Replace(feedbackGreeting,"str1 = (global.language == global.LANG_JAPANESE) ? \"你好，陌生人。\" : \"GREETINGS, STRANGER.\";"));
+var feedbackFireball=Data.Code.ByName("gml_Object_o35_iFireball_Alarm_0");
+var feedbackFireballSource=GetDecompiledText(feedbackFireball,new GlobalDecompileContext(Data));
+foreach(var literal in new[]{"\"A FIREBALL EXPLODES\"","\"AROUND YOU!\""})if(feedbackFireballSource.Split(new[]{literal},StringSplitOptions.None).Length!=2)throw new Exception("Moving fireball impact anchor changed: "+literal);
+feedbackFireballSource=feedbackFireballSource.Replace("\"A FIREBALL EXPLODES\"","((global.language == global.LANG_JAPANESE) ? \"火球在你身边炸开了！\" : \"A FIREBALL EXPLODES\")").Replace("\"AROUND YOU!\"","((global.language == global.LANG_JAPANESE) ? \"\" : \"AROUND YOU!\")");
+feedbackProse.QueueReplace(feedbackFireball,feedbackFireballSource);
+feedbackProse.Import();
+
+
 // 覆盖门禁：新增数字或动态字符串绘制点也必须进入统一字体路由。
 var bypassedDraws = Data.Code.Where(code => code.Offset == 0 && !wrapperCodes.Contains(code))
     .Where(code => code.Instructions.Any(instruction => instruction.Kind == UndertaleInstruction.Opcode.Call &&
