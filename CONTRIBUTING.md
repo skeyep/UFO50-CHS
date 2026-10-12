@@ -55,7 +55,7 @@ node source/builders/audit-game51.mjs --reference-root '<参考工程>'
 python source/builders/audit-layout.py --reference-root '<参考工程>' --text-root payload/ext/JAPANESE --font '<Zpix 字体路径>'
 ```
 
-检查报告默认写入 `dist/review/layout-audit.tsv`。显式逐行绘制、图形文字、逐字动画及图标混排需要隔离实机复测。修改《诡石镇》译文时直接编辑 `source/translations/grimstone-zh-cache.json`；历史批量润色脚本已移除。
+检查报告默认写入 `dist/review/layout-audit.tsv`。显式逐行绘制、图形文字、逐字动画及图标混排需要隔离实机复测。修改《诡石堡》译文时直接编辑 `source/translations/grimstone-zh-cache.json`；历史批量润色脚本已移除。
 
 ## 数字显示验收
 

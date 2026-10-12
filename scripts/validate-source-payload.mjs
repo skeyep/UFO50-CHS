@@ -42,7 +42,7 @@ function compare(sourceName, payloadName) {
   const payload = readPayload(payloadName);
   for (const [key,value] of Object.entries(source)) {
     if (typeof value !== "string" || layoutKey.test(key)) throw new Error(`译文源字段无效：${sourceName}/${key}`);
-    if (sourceName === "grimstone-zh-cache.json" && !grimstoneIsApproved(key)) throw new Error(`存在未认可的诡石镇译文：${key}`);
+    if (sourceName === "grimstone-zh-cache.json" && !grimstoneIsApproved(key)) throw new Error(`存在未认可的诡石堡译文：${key}`);
     if (payload[key] !== value) throw new Error(`译文源与载荷不同步：${sourceName}/${key}`);
     fields++;
   }

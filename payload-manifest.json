@@ -1,6 +1,6 @@
 {
-  "version": "1.2.1",
-  "generatedAt": "2026-10-12T00:00:29.6633341Z",
+  "version": "1.2.2",
+  "generatedAt": "2026-10-12T08:08:39.4383257Z",
   "files": [
     {
       "path": "Install-UFO50-CHS.cmd",
@@ -44,8 +44,8 @@
     },
     {
       "path": "payload/ext/JAPANESE/12_Text.json",
-      "sha256": "B2D92F338AA9710B2BB61E68672CA115DD4F04C5D50EF8BA1B559203FEA80106",
-      "size": 188848
+      "sha256": "BF7629A3F2AF210EEB2C3672F9482FB2CEFEA61A2DE8D7FC53AAF38723A1239F",
+      "size": 188856
     },
     {
       "path": "payload/ext/JAPANESE/13_Text.json",
@@ -279,7 +279,7 @@
     },
     {
       "path": "payload/ext/JAPANESE/m_Text.json",
-      "sha256": "2BAE267B32B7F8F29A36C3E21760B51FE56C719663DA68D45450061A75DE778E",
+      "sha256": "44A4FAAB9A39A9872FEDE25447A30B3554422A5BD5A1EB76F49D077C200ABB49",
       "size": 248644
     },
     {
@@ -289,12 +289,12 @@
     },
     {
       "path": "README.txt",
-      "sha256": "D8D2E2C444D344CF02F4F5269ED17565023C870C6EBEE302BC13D670A9403BD8",
+      "sha256": "601342E15D92CFEC8EEBEA6C894336C258AC90789D9E47F0E4D2FB0B2F2BD505",
       "size": 1579
     },
     {
       "path": "release-config.json",
-      "sha256": "B6D12900075E88F3C718BB060E5C5D2154D0236258C8DDA5C9550808ACB755E1",
+      "sha256": "F7770315887FF36178FBBE2CFD152CB1F14F672F152530879F0E53141D1F8C01",
       "size": 869
     },
     {
