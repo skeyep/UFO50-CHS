@@ -8,6 +8,7 @@ from pathlib import Path
 PATTERNS = {
     'cursor': re.compile(r'draw_sprite(?:_ext)?\([^,\n]*(?:[Hh]and|[Cc]ursor|[Ss]elect|[Pp]ointer|[Aa]rrow)|(?:[Hh]and|[Cc]ursor)\.(?:x|y)\s*=|\bcursor[XY]\s*=|draw_text\([^;\n]*,\s*"[><^]"\)'),
     'character-width': re.compile(r'string_length\([^;\n]*(?:\*\s*8\b|\b8\s*\*)|(?:\b8\s*\*\s*(?:i|j|k|sel|menuSel|subY)|\b(?:i|j|k|sel|menuSel|subY)\s*\*\s*8\b)'),
+    'fixed-character-step': re.compile(r'\(\s*(?:i|j|k)\s*[-+]\s*\d+\s*\)\s*\*\s*8\b'),
     'semantic-font': re.compile(r'scrSetFont\(global\.font(?:Avianos|Alien|Grimstone|FancyShort)\)'),
     # NameChar has an implicit native Draw and is absent from the old name-based cursor pattern.
     'input-caret': re.compile(r'\b[xy]\s*=[^;\n]*(?:currNameChar|nameSel[XY])|instance_create(?:_depth|_layer)?\([^;\n]*(?:NameChar|NameCursor|NameEntry)|draw_(?:sprite(?:_ext)?|text)\([^;\n]*(?:currFileName|currNameChar)'),

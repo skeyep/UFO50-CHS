@@ -4985,6 +4985,43 @@ feedbackProse.QueueReplace(feedbackFireball,feedbackFireballSource);
 feedbackProse.Import();
 
 
+// Player feedback: native bonus letter spacing and the prologue dialogue frame.
+var feedback14Imports=new CodeImportGroup(Data);
+void Feedback14Replace(string name,string find,string replacement,int expected=1) {
+    var code=Data.Code.ByName(name);
+    var source=GetDecompiledText(code,new GlobalDecompileContext(Data));
+    var count=source.Split(new[]{find},StringSplitOptions.None).Length-1;
+    if(count!=expected)throw new Exception("Feedback14 anchor count "+count+" != "+expected+": "+name);
+    feedback14Imports.QueueReplace(code,source.Replace(find,replacement));
+    feedback14Imports.Import();
+}
+Feedback14Replace("gml_Object_o47_PongBall_Draw_0",
+    "var _x = textx + ((i - 1) * 8);",
+    "var _x = textx + ((global.language == global.LANG_JAPANESE) ? string_width(string_copy(text, 1, i - 1)) : ((i - 1) * 8));",2);
+Feedback14Replace("gml_Object_o46_Prologue_Draw_0",
+    "draw_sprite(s46_Dialogue, 0, camera_get_view_x(view_get_camera(0)), camera_get_view_y(view_get_camera(0)) + 168);",
+    "if (global.language == global.LANG_JAPANESE && state >= 2)\n{\n    var _dialogueX = camera_get_view_x(view_get_camera(0));\n    var _dialogueY = camera_get_view_y(view_get_camera(0));\n    draw_sprite_part(s46_Dialogue, 0, 0, 0, 384, 40, _dialogueX, _dialogueY + 144);\n    draw_sprite_part(s46_Dialogue, 0, 0, 16, 384, 24, _dialogueX, _dialogueY + 184);\n    draw_sprite_part(s46_Dialogue, 0, 0, 40, 384, 8, _dialogueX, _dialogueY + 208);\n}\nelse draw_sprite(s46_Dialogue, 0, camera_get_view_x(view_get_camera(0)), camera_get_view_y(view_get_camera(0)) + 168);");
+Feedback14Replace("gml_Object_o46_Prologue_Draw_0",
+    "camera_get_view_y(view_get_camera(0)) + 176);",
+    "camera_get_view_y(view_get_camera(0)) + ((global.language == global.LANG_JAPANESE) ? 164 : 176));");
+Feedback14Replace("gml_Object_o46_Prologue_Draw_0",
+    "camera_get_view_y(view_get_camera(0)) + 168, name[port]);",
+    "camera_get_view_y(view_get_camera(0)) + ((global.language == global.LANG_JAPANESE) ? 152 : 168), name[port]);");
+Feedback14Replace("gml_Object_o46_Prologue_Draw_0",
+    "var _chsDialogueTop = (global.language == global.LANG_JAPANESE) ? (216 - (3 * _chsDialogueStep)) : 184;",
+    "var _chsDialogueTop = (global.language == global.LANG_JAPANESE) ? 168 : 184;");
+Feedback14Replace("gml_Object_o46_Prologue_Draw_0",
+    "UFO50_CHS_draw_text(camera_get_view_x(view_get_camera(0)) + 144, camera_get_view_y(view_get_camera(0)) + 96, \"SCORE \" + strScore);",
+    "if (global.language == global.LANG_JAPANESE)\n    {\n        var _scoreFont = draw_get_font();\n        draw_set_font(global.fontTall);\n        UFO50_CHS_draw_text(camera_get_view_x(view_get_camera(0)) + 144, camera_get_view_y(view_get_camera(0)) + 97, \"SCORE \" + strScore);\n        draw_set_font(_scoreFont);\n    }\n    else UFO50_CHS_draw_text(camera_get_view_x(view_get_camera(0)) + 144, camera_get_view_y(view_get_camera(0)) + 96, \"SCORE \" + strScore);");
+
+Feedback14Replace("gml_Object_o46_Prologue_Draw_0",
+    "var _chsDialogueStep = (global.language == global.LANG_JAPANESE) ? max(12, ceil(string_height(\"中\"))) : 8;",
+    "var _chsDialogueStep = (global.language == global.LANG_JAPANESE) ? max(14, ceil(string_height(\"中\")) + 3) : 8;");
+Feedback14Replace("gml_Object_o46_Prologue_Draw_0",
+    "    for (var i = 0; i < 3; i++)\n    {\n        UFO50_CHS_draw_text(camera_get_view_x(view_get_camera(0)) + 88, camera_get_view_y(view_get_camera(0)) + _chsDialogueTop + (_chsDialogueStep * i), strText[i]);\n    }",
+    "    var _visibleDialogueRow = 0;\n    for (var i = 0; i < 3; i++)\n    {\n        if (global.language == global.LANG_JAPANESE && dText[i][stepText] == \"\") continue;\n        var _drawDialogueRow = (global.language == global.LANG_JAPANESE) ? _visibleDialogueRow : i;\n        UFO50_CHS_draw_text(camera_get_view_x(view_get_camera(0)) + 88, camera_get_view_y(view_get_camera(0)) + _chsDialogueTop + (_chsDialogueStep * _drawDialogueRow), strText[i]);\n        _visibleDialogueRow++;\n    }");
+
+
 // 覆盖门禁：新增数字或动态字符串绘制点也必须进入统一字体路由。
 var bypassedDraws = Data.Code.Where(code => code.Offset == 0 && !wrapperCodes.Contains(code))
     .Where(code => code.Instructions.Any(instruction => instruction.Kind == UndertaleInstruction.Opcode.Call &&

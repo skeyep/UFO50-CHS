@@ -15,7 +15,8 @@ numeric = 0
 for file in files:
     for index, row in enumerate(json.loads(file.read_text(encoding='utf-8'))):
         value = str(row['text'])
-        if not any(c in '0123456789' for c in value) or not (set(value) <= allowed or re.fullmatch(r'[+-]?\d+(?:ATK|DEF|SPD|EVD)', value)):
+        ascii_counter = re.fullmatch(r'(?:SCORE|HI(?:GH)?\s*SCORE|TIME)\s*[:=]?\s*\d[\d:./ ]*', value, re.IGNORECASE)
+        if not any(c in '0123456789' for c in value) or not (set(value) <= allowed or re.fullmatch(r'[+-]?\d+(?:ATK|DEF|SPD|EVD)', value) or ascii_counter):
             continue
         numeric += 1
         reason = None
