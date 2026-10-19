@@ -3,6 +3,7 @@ import path from "node:path";
 import { grimstoneIsApproved } from "../source/builders/grimstone-review-policy.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
+const creditProsePatterns = JSON.parse(fs.readFileSync(path.join(root, "scripts/credit-prose-policy.json"), "utf8")).patterns.map(pattern => new RegExp(pattern, "i"));
 function readJson(file) {
   return JSON.parse(fs.readFileSync(file,"utf8").replace(/^\uFEFF/, ""));
 }
@@ -30,9 +31,12 @@ function checkCoverage(payload, keys, name) {
     if (limit > 0 && [...value].length > limit) {
       throw new Error(`文本被运行时字符上限截断：${name}/${key}，长度 ${[...value].length}，上限 ${limit}`);
     }
+    if (name === "m_Text.json" && /^game_credits_\d+_\d+b?$/.test(key) && creditProsePatterns.some(pattern => pattern.test(value.trim().replace(/^[ *-]+|[ *-]+$/g, "")))) {
+      throw new Error(`制作名单正文仍待汉化：${key}，${value}`);
+    }
     if (!value.trim() || layoutKey.test(key) || keys.has(key)) continue;
     if (name === "0_Text.json" && menuOriginal[key] === value) continue;
-    // 元数据中的原版内部简称、输入代码、榜单姓名和职员表由参考资源审计核对。
+    // 内部简称、输入代码、榜单姓名及名单里的身份信息保持原文。
     if (name === "m_Text.json" && /^game_(?:internal_name_[A-Za-z0-9_]+|(?:cheat|hs)_\d+_\d+|credits_\d+_\d+b?)$/.test(key) && !/[\u3400-\u9fff]/u.test(value)) continue;
     throw new Error(`载荷正文缺少译文源：${name}/${key}`);
   }

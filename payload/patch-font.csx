@@ -5022,6 +5022,59 @@ Feedback14Replace("gml_Object_o46_Prologue_Draw_0",
     "    var _visibleDialogueRow = 0;\n    for (var i = 0; i < 3; i++)\n    {\n        if (global.language == global.LANG_JAPANESE && dText[i][stepText] == \"\") continue;\n        var _drawDialogueRow = (global.language == global.LANG_JAPANESE) ? _visibleDialogueRow : i;\n        UFO50_CHS_draw_text(camera_get_view_x(view_get_camera(0)) + 88, camera_get_view_y(view_get_camera(0)) + _chsDialogueTop + (_chsDialogueStep * _drawDialogueRow), strText[i]);\n        _visibleDialogueRow++;\n    }");
 
 
+// Feedback19: readable Chinese LED text and context-aware credit rows.
+var feedback19Imports=new CodeImportGroup(Data);
+void Feedback19Replace(string name,string find,string replacement,int expected=1) {
+    var c=Data.Code.ByName(name);var src=GetDecompiledText(c,new GlobalDecompileContext(Data));
+    var count=src.Split(new[]{find},StringSplitOptions.None).Length-1;
+    if(count!=expected)throw new Exception("Feedback19 anchor count "+count+" != "+expected+": "+name);
+    feedback19Imports.QueueReplace(c,src.Replace(find,replacement));feedback19Imports.Import();
+}
+var feedback19CreditHelper="""
+function UFO50_CHS_draw_credit_row(_x,_y,_text,_width,_left,_nativeFont,_cell) {
+    var _font=draw_get_font(),_request=global.chsRequestedFont,_current=global.currFont,_align=draw_get_halign();
+    var _cjk=UFO50_CHS_crack_has_cjk(_text);
+    var _length=_cjk?string_width(_text):string_length(_text)*_cell;
+    if(!_left)_x+=ceil((_width-_length)/2);
+    draw_set_halign(fa_left);
+    if(!_cjk){draw_set_font(_nativeFont);global.chsRequestedFont=_nativeFont;}
+    var _cancel=(!_cjk && UFO50_CHS_number_font(_text)<0)?1:0;
+    UFO50_CHS_draw_text(_x,_y+_cancel,_text);
+    draw_set_font(_font);global.chsRequestedFont=_request;global.currFont=_current;draw_set_halign(_align);
+}
+""";
+var feedback19HelperImports=new CodeImportGroup(Data);feedback19HelperImports.AutoCreateAssets=true;
+feedback19HelperImports.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_credit_row",feedback19CreditHelper);feedback19HelperImports.Import();
+Feedback19Replace("gml_Object_oDCut_Draw_0","draw_set_colour(fontColor);",
+    "var _creditNativeFont=fontCustom;\nif(fontType==0)_creditNativeFont=global.fontDefault;else if(fontType==1)_creditNativeFont=global.fontTall;else if(fontType==2)_creditNativeFont=global.fontFancyShort;\ndraw_set_colour(fontColor);");
+Feedback19Replace("gml_Object_oDCut_Draw_0",
+    "scrDrawTextCenteredPoint(strScroll[i], _xview + scrollX, _yview + _scrollYrounded + scrollDelta, 8);",
+    "if(global.language==global.LANG_JAPANESE)UFO50_CHS_draw_credit_row(_xview+scrollX,_yview+_scrollYrounded+scrollDelta,strScroll[i],0,false,_creditNativeFont,8);else scrDrawTextCenteredPoint(strScroll[i], _xview + scrollX, _yview + _scrollYrounded + scrollDelta, 8);");
+Feedback19Replace("gml_Object_oDCut_Draw_0",
+    "UFO50_CHS_draw_text(_xview + scrollX, _yview + _scrollYrounded + scrollDelta, strScroll[i]);",
+    "if(global.language==global.LANG_JAPANESE)UFO50_CHS_draw_credit_row(_xview+scrollX,_yview+_scrollYrounded+scrollDelta,strScroll[i],0,true,_creditNativeFont,8);else UFO50_CHS_draw_text(_xview + scrollX, _yview + _scrollYrounded + scrollDelta, strScroll[i]);");
+Feedback19Replace("gml_Object_oDCut_Draw_0",
+    "        for (var i = currText; i < (currText + textAdvance); i++)",
+    "        var _creditPitch=fontHeight;\n        if(global.language==global.LANG_JAPANESE){for(var _j=currText;_j<currText+textAdvance;_j++){if(UFO50_CHS_crack_has_cjk(strScroll[_j])){_creditPitch=max(fontHeight,ceil(string_height(\"中\"))+3);break;}}}\n        for (var i = currText; i < (currText + textAdvance); i++)");
+Feedback19Replace("gml_Object_oDCut_Draw_0",
+    "scrDrawTextCentered(strScroll[i], _xview + xShift, _yview + yShift + ((216 - (fontHeight * textAdvance)) / 2) + (fontHeight * (i - currText)), fontCustomWidth, 384);",
+    "if(global.language==global.LANG_JAPANESE)UFO50_CHS_draw_credit_row(_xview+xShift,_yview+yShift+(216-_creditPitch*textAdvance)/2+_creditPitch*(i-currText),strScroll[i],384,false,_creditNativeFont,fontCustomWidth);else scrDrawTextCentered(strScroll[i], _xview + xShift, _yview + yShift + ((216 - (fontHeight * textAdvance)) / 2) + (fontHeight * (i - currText)), fontCustomWidth, 384);");
+Feedback19Replace("gml_Object_o23_DM_Draw_0",
+    "var _dm_w = 2;",
+    "var _dmCHS=global.language==global.LANG_JAPANESE && UFO50_CHS_crack_has_cjk(stageName);\n            var _dm_w = _dmCHS ? ceil(string_width(stageName)*2)+4 : 2;");
+Feedback19Replace("gml_Object_o23_DM_Draw_0",
+    "            for (var i = 1; i <= string_length(stageName); i++)",
+    "            for (var i = 1; !_dmCHS && i <= string_length(stageName); i++)",2);
+Feedback19Replace("gml_Object_o23_DM_Draw_0",
+    "var _char_x = 2;",
+    "var _char_x = 2;\n            if(_dmCHS){var _dmColor=draw_get_color();draw_set_color(make_color_rgb(232,125,46));draw_text_transformed(2,8,stageName,2,2,0);draw_set_color(_dmColor);}");
+Feedback19Replace("gml_Object_o17__Game_Draw_0",
+    "        for (var n = 0; n <= 41; n++)",
+    "        var _creditOffset=0;\n        for (var n = 0; n <= 41; n++)");
+Feedback19Replace("gml_Object_o17__Game_Draw_0",
+    "UFO50_CHS_draw_text(tx, _yview + creditsY + (8 * n), _credit);",
+    "if(global.language==global.LANG_JAPANESE){UFO50_CHS_draw_credit_row(tx,_yview+creditsY+_creditOffset,_credit,0,true,global.fontDefault,8);_creditOffset+=UFO50_CHS_crack_has_cjk(_credit)?max(8,ceil(string_height(\"中\"))+3):8;}else UFO50_CHS_draw_text(tx, _yview + creditsY + (8 * n), _credit);");
+
 // 覆盖门禁：新增数字或动态字符串绘制点也必须进入统一字体路由。
 var bypassedDraws = Data.Code.Where(code => code.Offset == 0 && !wrapperCodes.Contains(code))
     .Where(code => code.Instructions.Any(instruction => instruction.Kind == UndertaleInstruction.Opcode.Call &&

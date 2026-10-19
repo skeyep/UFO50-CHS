@@ -1,0 +1,11 @@
+{
+  "description": "制作名单中的玩家正文候选；人员名、职务标题、品牌和输入代码继续独立审阅。",
+  "patterns": [
+    "\\bONLY A FEW HUNDRED\\b|\\bQUIBBLES WERE HARMED\\b|\\bTHE MAKING OF THIS GAME\\b",
+    "\\bDEDICATED TO ALL\\b|\\bTHE POOR ANTS\\b|\\bSTILL LABORING\\b|\\bAMONG US\\b",
+    "\\bYOU ARE INVITED\\b|\\bTO TRY THE CODES\\b|\\bEXTRA CHALLENGE\\b",
+    "\\bTHANK YOU FOR\\b|\\bTHANKS FOR\\b|\\bPLAYING!?$|\\bCRASHING WITH US\\b",
+    "\\bYOU, THE PLAYER\\b|\\bYOUR SKILL IS GREAT\\b",
+    "^REMEMBER:|\\bPLAY IS THE WAY\\b"
+  ]
+}
