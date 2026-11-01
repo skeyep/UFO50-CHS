@@ -24,6 +24,36 @@ var golferTitleItem = new UndertaleTexturePageItem {
 Data.TexturePageItems.Add(golferTitleItem);
 golferTitleSprite.Textures.Add(new UndertaleSprite.TextureEntry { Texture = golferTitleItem });
 
+// Localized display titles share the original scene's texture group. Their
+// frames are referenced explicitly so existing sprite animations are unchanged.
+void AppendArtTitleFrames(string spriteName, string assetName, int expectedFrames,
+                          ushort width, ushort height, ushort frameCount,
+                          ushort boundingWidth, ushort boundingHeight)
+{
+    var sprite = Data.Sprites.ByName(spriteName);
+    if (sprite == null || sprite.Textures.Count != expectedFrames)
+        throw new System.Exception("Unexpected title sprite: " + spriteName);
+    var group = Data.TextureGroupInfo.Single(g => g.Sprites.Any(s => s.Resource == sprite));
+    var texture = new UndertaleEmbeddedTexture { Name = new UndertaleString($"Texture {Data.EmbeddedTextures.Count}") };
+    texture.TextureData.Image = GMImage.FromPng(File.ReadAllBytes(Path.Combine(Path.GetDirectoryName(ScriptPath), "assets", assetName)));
+    Data.EmbeddedTextures.Add(texture);
+    group.TexturePages.Add(new UndertaleResourceById<UndertaleEmbeddedTexture, UndertaleChunkTXTR> { Resource = texture });
+    for (ushort frame = 0; frame < frameCount; frame++)
+    {
+        var item = new UndertaleTexturePageItem {
+            Name = new UndertaleString($"PageItem {Data.TexturePageItems.Count}"), TexturePage = texture,
+            SourceX = 0, SourceY = (ushort)(frame * height), SourceWidth = width, SourceHeight = height,
+            TargetX = 0, TargetY = 0, TargetWidth = width, TargetHeight = height,
+            BoundingWidth = boundingWidth, BoundingHeight = boundingHeight
+        };
+        Data.TexturePageItems.Add(item);
+        sprite.Textures.Add(new UndertaleSprite.TextureEntry { Texture = item });
+    }
+}
+AppendArtTitleFrames("s13_MissionBrief", "rail-mission-titles.png", 8, 96, 24, 20, 384, 216);
+AppendArtTitleFrames("s13_MissionBrief", "rail-ending.png", 28, 24, 26, 1, 384, 216);
+AppendArtTitleFrames("s42_Star", "fighters-play-mode.png", 3, 88, 20, 1, 88, 32);
+
 var initFonts = """
 function scrInitFonts()
 {
@@ -5145,6 +5175,45 @@ var f1101avianSprite=f1101avianCode.Contains("QA_draw_sprite(s50_All")?"QA_draw_
 Feedback1101Replace("gml_Object_o50_Game_Draw_0",
     f1101avianSprite+"(s50_All, 0, TRANS_LEFT + 56, windowTop + 8);",
     "if(global.language==global.LANG_JAPANESE) {var _oldColor50=draw_get_color();draw_set_color(make_color_rgb(255,164,54));UFO50_CHS_draw_avianos_mixed(TRANS_LEFT+56,windowTop+8,\"全部\");draw_set_color(_oldColor50);} else "+f1101avianSprite+"(s50_All, 0, TRANS_LEFT + 56, windowTop + 8);");
+
+// Western and gradient titles use art; plain course labels scale the existing font.
+Feedback1101Replace("gml_Object_o13_Game_Draw_0",
+    "draw_text_centered(midX, 8, drawLevel.missionName, 16);",
+    "if (global.language == global.LANG_JAPANESE && i >= 1 && i <= 20) draw_sprite(s13_MissionBrief, 7 + i, midX - 48, 8); else draw_text_centered(midX, 8, drawLevel.missionName, 16);");
+Feedback1101Replace("gml_Object_o13_Game_Draw_0",
+    "draw_text_centered(centerX, viewy + 96, string_even(currLevel.missionName, 3), 16);",
+    "if (global.language == global.LANG_JAPANESE && lvl >= 1 && lvl <= 20) draw_sprite(s13_MissionBrief, 7 + lvl, centerX - 48, viewy + 96); else draw_text_centered(centerX, viewy + 96, string_even(currLevel.missionName, 3), 16);");
+Feedback1101Replace("gml_Object_o13_Game_Draw_0",
+    "draw_text_centered(viewx + 192, viewy + 32, scrStringEven(\"the_end\", 3), 16);",
+    "if (global.language == global.LANG_JAPANESE) draw_sprite(s13_MissionBrief, 28, viewx + 180, viewy + 32); else draw_text_centered(viewx + 192, viewy + 32, scrStringEven(\"the_end\", 3), 16);");
+Feedback1101Replace("gml_Object_o42_Game_Draw_0",
+    "scrStringDrawCenterExt(\"play_mode\", 0, 72, 8, 384, 0, 0, 4);",
+    "if (global.language == global.LANG_JAPANESE) draw_sprite(s42_Star, 3, 148, 72); else scrStringDrawCenterExt(\"play_mode\", 0, 72, 8, 384, 0, 0, 4);");
+Feedback1101Replace("gml_Object_o49_Game_Draw_0",
+    "        draw_set_halign(fa_center);\n        UFO50_CHS_draw_fixed_mixed(192, 64, levelString, 2);\n        draw_set_halign(_chsMixedAlign);",
+    """
+        var _chsTitleValign = draw_get_valign();
+        draw_set_halign(fa_left);
+        draw_set_valign(fa_top);
+        var _chsTitleLabel = level <= 25 ? string_replace_all(scrStringVal("level", ""), " ", "") : scrString("final_showdown");
+        var _chsLabelWidth = ceil(string_width(_chsTitleLabel) * 2);
+        // The native 16px digit font occupies 14 visible rows at this call site.
+        var _chsLabelY = 78 - ceil(string_height(_chsTitleLabel) * 2);
+        if (level <= 25)
+        {
+            var _chsDigits = string(level);
+            var _chsTitleWidth = _chsLabelWidth + 8 + UFO50_CHS_fixed_mixed_width(_chsDigits);
+            var _chsTitleX = 192 - floor(_chsTitleWidth / 2);
+            draw_text_transformed(_chsTitleX, _chsLabelY, _chsTitleLabel, 2, 2, 0);
+            UFO50_CHS_draw_fixed_mixed(_chsTitleX + _chsLabelWidth + 8, 64, _chsDigits, 0);
+        }
+        else
+        {
+            draw_text_transformed(192 - floor(_chsLabelWidth / 2), _chsLabelY, _chsTitleLabel, 2, 2, 0);
+        }
+        draw_set_valign(_chsTitleValign);
+        draw_set_halign(_chsMixedAlign);
+""");
 
 // 覆盖门禁：新增数字或动态字符串绘制点也必须进入统一字体路由。
 var bypassedDraws = Data.Code.Where(code => code.Offset == 0 && !wrapperCodes.Contains(code))

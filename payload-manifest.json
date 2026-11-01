@@ -1,6 +1,6 @@
 {
-  "version": "1.2.7",
-  "generatedAt": "2026-11-01T05:15:58.7152548Z",
+  "version": "1.2.8",
+  "generatedAt": "2026-11-01T08:24:23.4196503Z",
   "files": [
     {
       "path": "Check-UFO50-CHS.cmd",
@@ -38,9 +38,24 @@
       "size": 1256
     },
     {
+      "path": "payload/assets/fighters-play-mode.png",
+      "sha256": "06F6A85C3B56B9AAA3580D1CC1982FD7C477C4958F8206FE20C594F868999269",
+      "size": 637
+    },
+    {
       "path": "payload/assets/pingolf-select-golfer.png",
       "sha256": "2351B4A5B4018A4AD69DBB25CDB0BA1CF8301CEF7700E6B1C438F2CFEB470201",
       "size": 673
+    },
+    {
+      "path": "payload/assets/rail-ending.png",
+      "sha256": "FBAB87404426AC293541C64F97681AB222BC03580BE178D5B9162F595FF8F8D1",
+      "size": 270
+    },
+    {
+      "path": "payload/assets/rail-mission-titles.png",
+      "sha256": "46E6770BA6D1EAA4F3161ADBF66AA79F2609CFA0BA1FF92DA91749EFAEAF5D6E",
+      "size": 9516
     },
     {
       "path": "payload/ext/JAPANESE/0_Text.json",
@@ -304,8 +319,8 @@
     },
     {
       "path": "payload/patch-font.csx",
-      "sha256": "58883CA60486A852CE8A7BA6E8B29B8E27E7366D7FD365A19538DD76E48F9C64",
-      "size": 344262
+      "sha256": "80D5536610E327C00D0D8DBB13C4FAA54E8BB4ACCF3DE2D95BE97958E898C5B9",
+      "size": 348937
     },
     {
       "path": "README.txt",
@@ -314,7 +329,7 @@
     },
     {
       "path": "release-config.json",
-      "sha256": "C8EF2D2A8F3DF482D2F4153F640FFAEFE28B1303118253D7E99A4C90331B5369",
+      "sha256": "649C939EC3EC65A46326EA7E75B1DB8972D644DBE0F78124EC93F678372EDAE6",
       "size": 869
     },
     {
