@@ -1,8 +1,28 @@
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
+using UndertaleModLib;
+using UndertaleModLib.Util;
 
 EnsureDataLoaded();
+
+// Chinese Pingolf heading: an image-generated pixel title packed as a second
+// frame of the original sprite, in the same texture group as the English art.
+var golferTitleSprite = Data.Sprites.ByName("s23_SelectGolfer");
+if (golferTitleSprite == null || golferTitleSprite.Textures.Count != 1)
+    throw new System.Exception("Unexpected Pingolf title sprite");
+var golferTitleGroup = Data.TextureGroupInfo.Single(g => g.Sprites.Any(s => s.Resource == golferTitleSprite));
+var golferTitleTexture = new UndertaleEmbeddedTexture { Name = new UndertaleString($"Texture {Data.EmbeddedTextures.Count}") };
+golferTitleTexture.TextureData.Image = GMImage.FromPng(File.ReadAllBytes(Path.Combine(Path.GetDirectoryName(ScriptPath), "assets", "pingolf-select-golfer.png")));
+Data.EmbeddedTextures.Add(golferTitleTexture);
+golferTitleGroup.TexturePages.Add(new UndertaleResourceById<UndertaleEmbeddedTexture, UndertaleChunkTXTR> { Resource = golferTitleTexture });
+var golferTitleItem = new UndertaleTexturePageItem {
+    Name = new UndertaleString($"PageItem {Data.TexturePageItems.Count}"), TexturePage = golferTitleTexture,
+    SourceX = 0, SourceY = 0, SourceWidth = 96, SourceHeight = 24,
+    TargetX = 32, TargetY = 0, TargetWidth = 96, TargetHeight = 24, BoundingWidth = 160, BoundingHeight = 32
+};
+Data.TexturePageItems.Add(golferTitleItem);
+golferTitleSprite.Textures.Add(new UndertaleSprite.TextureEntry { Texture = golferTitleItem });
 
 var initFonts = """
 function scrInitFonts()
@@ -4683,6 +4703,10 @@ var label46="UFO50_CHS_draw_text(arg0, arg1, arg2);";
 if(Regex.Matches(base46,Regex.Escape(label46)).Count!=1)throw new Exception("46 label helper anchor");
 base46=base46.Replace("function UFO50_CHS_draw_labeled_number(","function UFO50_CHS_draw_shutter_next(").Replace(label46,"UFO50_CHS_draw_text(arg0, arg1 - 2, arg2);");
 basic4046.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_shutter_next",base46);
+var miniClockHelper=GetDecompiledText(Data.Code.ByName("gml_GlobalScript_UFO50_CHS_draw_labeled_number"),new GlobalDecompileContext(Data));
+if(Regex.Matches(miniClockHelper,Regex.Escape(label46)).Count!=1)throw new Exception("41 time label helper anchor");
+miniClockHelper=miniClockHelper.Replace("function UFO50_CHS_draw_labeled_number(","function UFO50_CHS_draw_mini_time(").Replace(label46,"UFO50_CHS_draw_text(arg0, arg1 - 4, arg2);");
+basic4046.QueueReplace("gml_GlobalScript_UFO50_CHS_draw_mini_time",miniClockHelper);
 Basic4046Replace("gml_Object_o46_Mas_Draw_0",
  "UFO50_CHS_draw_labeled_number(_xv + 136, _yv + 160, scrString(\"to_next\") + \": \", strNext, 0);",
  "UFO50_CHS_draw_shutter_next(_xv + 136, _yv + 160, scrString(\"to_next\") + \": \", strNext, 0);");
@@ -5095,7 +5119,7 @@ var f1101golferCode=GetDecompiledText(Data.Code.ByName("gml_Object_o23_Mas_Draw_
 var f1101sprite=f1101golferCode.Contains("QA_draw_sprite(s23_SelectGolfer")?"QA_draw_sprite":"draw_sprite";
 Feedback1101Replace("gml_Object_o23_Mas_Draw_0",
     f1101sprite+"(s23_SelectGolfer, 0, _xview + 112, _yview + 16);",
-    "if(global.language==global.LANG_JAPANESE) { var _oldFont=draw_get_font(),_oldColor=draw_get_color(),_oldCurrent=global.currFont,_oldRequest=global.chsRequestedFont; scrSetFont(global.fontTall); draw_set_color(make_color_rgb(150,92,56)); var _title=\"选择球手\"; draw_text_transformed(_xview+192-string_width(_title),_yview+15,_title,2,2,0); draw_set_color(_oldColor); draw_set_font(_oldFont); global.currFont=_oldCurrent; global.chsRequestedFont=_oldRequest; } else "+f1101sprite+"(s23_SelectGolfer, 0, _xview + 112, _yview + 16);");
+    "if(global.language==global.LANG_JAPANESE) "+f1101sprite+"(s23_SelectGolfer, 1, _xview + 112, _yview + 16); else "+f1101sprite+"(s23_SelectGolfer, 0, _xview + 112, _yview + 16);");
 Feedback1101Replace("gml_Object_o23_Mas_Draw_0",
     f1101sprite+"(s23_Navi, i, _xPortrait + (navi[i] * 64), _yPortrait - 16);",
     "if(global.language==global.LANG_JAPANESE) {var _oldFontN=draw_get_font(),_oldColorN=draw_get_color(),_oldCurrentN=global.currFont,_oldRequestN=global.chsRequestedFont; scrSetFont(global.fontDefault); draw_set_color(make_color_rgb(229,98,229)); var _playerX=_xPortrait+(navi[i]*64); UFO50_CHS_draw_text(_playerX,_yPortrait-16,\"玩家\"); UFO50_CHS_draw_text(_playerX+string_width(\"玩家\"),_yPortrait-13,string(i+1)); draw_set_color(_oldColorN); draw_set_font(_oldFontN); global.currFont=_oldCurrentN; global.chsRequestedFont=_oldRequestN;} else "+f1101sprite+"(s23_Navi, i, _xPortrait + (navi[i] * 64), _yPortrait - 16);");
@@ -5106,10 +5130,10 @@ Feedback1101Replace("gml_Object_o41_Game_Draw_0",
     "clockString = string((global.language==global.LANG_JAPANESE) ? clockHour-12 : 12-clockHour) + \":\";");
 Feedback1101Replace("gml_Object_o41_Game_Draw_0",
     "UFO50_CHS_draw_text(viewx + 8, viewy + 8, clockString);",
-    "if(global.language==global.LANG_JAPANESE) UFO50_CHS_draw_labeled_number(viewx+8,viewy+8,(clockHour<12 ? \"下午 \" : \"上午 \"),clockString,fa_left); else UFO50_CHS_draw_text(viewx + 8, viewy + 8, clockString);");
+    "if(global.language==global.LANG_JAPANESE) UFO50_CHS_draw_mini_time(viewx+8,viewy+8,(clockHour<12 ? \"下午 \" : \"上午 \"),clockString,fa_left); else UFO50_CHS_draw_text(viewx + 8, viewy + 8, clockString);");
 Feedback1101Replace("gml_Object_o41_Game_Draw_0",
     "UFO50_CHS_draw_text(viewx + 8, viewy + 16, clockString);",
-    "if(global.language==global.LANG_JAPANESE) UFO50_CHS_draw_labeled_number(viewx+8,viewy+8+max(8,ceil(string_height(\"中\"))+3),(clockHour<12 ? \"下午 \" : \"上午 \"),clockString,fa_left); else UFO50_CHS_draw_text(viewx + 8, viewy + 16, clockString);");
+    "if(global.language==global.LANG_JAPANESE) UFO50_CHS_draw_mini_time(viewx+8,viewy+10+max(8,ceil(string_height(\"中\"))+3),(clockHour<12 ? \"下午 \" : \"上午 \"),clockString,fa_left); else UFO50_CHS_draw_text(viewx + 8, viewy + 16, clockString);");
 Feedback1101Replace("gml_Object_o50_Game_Draw_0",
     "UFO50_CHS_draw_avianos_mixed(TRANS_LEFT + 8, windowTop + 8, \"STAY\");",
     "UFO50_CHS_draw_avianos_mixed(TRANS_LEFT + 8, windowTop + 8, (global.language==global.LANG_JAPANESE ? \"留守\" : \"STAY\"));");

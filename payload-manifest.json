@@ -1,6 +1,6 @@
 {
-  "version": "1.2.5",
-  "generatedAt": "2026-11-01T04:02:21.0591177Z",
+  "version": "1.2.6",
+  "generatedAt": "2026-11-01T04:38:15.2476724Z",
   "files": [
     {
       "path": "Check-UFO50-CHS.cmd",
@@ -36,6 +36,11 @@
       "path": "installer/Uninstall-UFO50-CHS.ps1",
       "sha256": "48B02772E2CF94F00061E40F3854828637A190F182FEDEA82C798E32771129E0",
       "size": 1256
+    },
+    {
+      "path": "payload/assets/pingolf-select-golfer.png",
+      "sha256": "D73413A8F70BC96F20092B14225DAB5732AF5806C0806285E8DCA7A6BB73E79A",
+      "size": 671
     },
     {
       "path": "payload/ext/JAPANESE/0_Text.json",
@@ -299,8 +304,8 @@
     },
     {
       "path": "payload/patch-font.csx",
-      "sha256": "1EBD9FAE39C76C02770F6E21958F74CC29E4A7A3EE2FBD9200F110B7A90F16D2",
-      "size": 342619
+      "sha256": "58883CA60486A852CE8A7BA6E8B29B8E27E7366D7FD365A19538DD76E48F9C64",
+      "size": 344262
     },
     {
       "path": "README.txt",
@@ -309,7 +314,7 @@
     },
     {
       "path": "release-config.json",
-      "sha256": "9739515CC7C7C8786A0A2D05A85214DFE457AE43C0A5154271FE164F7F04D1EE",
+      "sha256": "D12C5ADFE32F32AD6837B8AD42321DC3080CC55C3177B25EF1E0FA8E391A86A8",
       "size": 869
     },
     {
