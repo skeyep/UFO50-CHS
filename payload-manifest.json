@@ -1,6 +1,6 @@
 {
-  "version": "1.2.6",
-  "generatedAt": "2026-11-01T04:38:15.2476724Z",
+  "version": "1.2.7",
+  "generatedAt": "2026-11-01T05:15:58.7152548Z",
   "files": [
     {
       "path": "Check-UFO50-CHS.cmd",
@@ -39,8 +39,8 @@
     },
     {
       "path": "payload/assets/pingolf-select-golfer.png",
-      "sha256": "D73413A8F70BC96F20092B14225DAB5732AF5806C0806285E8DCA7A6BB73E79A",
-      "size": 671
+      "sha256": "2351B4A5B4018A4AD69DBB25CDB0BA1CF8301CEF7700E6B1C438F2CFEB470201",
+      "size": 673
     },
     {
       "path": "payload/ext/JAPANESE/0_Text.json",
@@ -314,7 +314,7 @@
     },
     {
       "path": "release-config.json",
-      "sha256": "D12C5ADFE32F32AD6837B8AD42321DC3080CC55C3177B25EF1E0FA8E391A86A8",
+      "sha256": "C8EF2D2A8F3DF482D2F4153F640FFAEFE28B1303118253D7E99A4C90331B5369",
       "size": 869
     },
     {
