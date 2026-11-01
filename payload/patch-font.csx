@@ -5075,6 +5075,53 @@ Feedback19Replace("gml_Object_o17__Game_Draw_0",
     "UFO50_CHS_draw_text(tx, _yview + creditsY + (8 * n), _credit);",
     "if(global.language==global.LANG_JAPANESE){UFO50_CHS_draw_credit_row(tx,_yview+creditsY+_creditOffset,_credit,0,true,global.fontDefault,8);_creditOffset+=UFO50_CHS_crack_has_cjk(_credit)?max(8,ceil(string_height(\"中\"))+3):8;}else UFO50_CHS_draw_text(tx, _yview + creditsY + (8 * n), _credit);");
 
+// 2026-11-01: fixes verified against the corresponding isolated game scenes.
+void Feedback1101Replace(string name, string find, string replace, int expected = 1) {
+    var code = Data.Code.ByName(name);
+    if(code == null) throw new Exception("Missing feedback target: " + name);
+    var src = GetDecompiledText(code, new GlobalDecompileContext(Data));
+    var count = src.Split(new[]{find}, StringSplitOptions.None).Length - 1;
+    if(count != expected) throw new Exception("Feedback anchor count " + count + " / " + expected + ": " + name + " / " + find);
+    var group = new CodeImportGroup(Data);
+    group.QueueReplace(code, src.Replace(find, replace)); group.Import();
+}
+Feedback1101Replace("gml_Object_o18__Game_Draw_0",
+    "scrStringDrawCenterAltExt(_xv + 240, _yv + 96, \"you_win\", 0, 10, 4);",
+    "scrStringDrawCenterAltExt(_xv + ((global.language == global.LANG_JAPANESE) ? 246 : 240), _yv + 96, \"you_win\", 0, 10, 4);", 2);
+Feedback1101Replace("gml_Object_o46_Mas_Draw_0",
+    "scrDrawTextCentered(endText[i][endingType], _xv, _yv + 136 + (8 * i), 8, 384);",
+    "scrDrawTextCentered(endText[i][endingType], _xv, _yv + 136 + (((global.language == global.LANG_JAPANESE) ? max(8, ceil(string_height(\"中\")) + 3) : 8) * i), 8, 384);");
+var f1101golferCode=GetDecompiledText(Data.Code.ByName("gml_Object_o23_Mas_Draw_0"),new GlobalDecompileContext(Data));
+var f1101sprite=f1101golferCode.Contains("QA_draw_sprite(s23_SelectGolfer")?"QA_draw_sprite":"draw_sprite";
+Feedback1101Replace("gml_Object_o23_Mas_Draw_0",
+    f1101sprite+"(s23_SelectGolfer, 0, _xview + 112, _yview + 16);",
+    "if(global.language==global.LANG_JAPANESE) { var _oldFont=draw_get_font(),_oldColor=draw_get_color(),_oldCurrent=global.currFont,_oldRequest=global.chsRequestedFont; scrSetFont(global.fontTall); draw_set_color(make_color_rgb(150,92,56)); var _title=\"选择球手\"; draw_text_transformed(_xview+192-string_width(_title),_yview+15,_title,2,2,0); draw_set_color(_oldColor); draw_set_font(_oldFont); global.currFont=_oldCurrent; global.chsRequestedFont=_oldRequest; } else "+f1101sprite+"(s23_SelectGolfer, 0, _xview + 112, _yview + 16);");
+Feedback1101Replace("gml_Object_o23_Mas_Draw_0",
+    f1101sprite+"(s23_Navi, i, _xPortrait + (navi[i] * 64), _yPortrait - 16);",
+    "if(global.language==global.LANG_JAPANESE) {var _oldFontN=draw_get_font(),_oldColorN=draw_get_color(),_oldCurrentN=global.currFont,_oldRequestN=global.chsRequestedFont; scrSetFont(global.fontDefault); draw_set_color(make_color_rgb(229,98,229)); var _playerX=_xPortrait+(navi[i]*64); UFO50_CHS_draw_text(_playerX,_yPortrait-16,\"玩家\"); UFO50_CHS_draw_text(_playerX+string_width(\"玩家\"),_yPortrait-13,string(i+1)); draw_set_color(_oldColorN); draw_set_font(_oldFontN); global.currFont=_oldCurrentN; global.chsRequestedFont=_oldRequestN;} else "+f1101sprite+"(s23_Navi, i, _xPortrait + (navi[i] * 64), _yPortrait - 16);");
+Feedback1101Replace("gml_Object_o41_Game_Draw_0","clockString = \"ごご\" + clockString;","clockString = clockString;");
+Feedback1101Replace("gml_Object_o41_Game_Draw_0","clockString = \"ごぜん\" + clockString;","clockString = clockString;");
+Feedback1101Replace("gml_Object_o41_Game_Draw_0",
+    "clockString = string(12 - clockHour) + \":\";",
+    "clockString = string((global.language==global.LANG_JAPANESE) ? clockHour-12 : 12-clockHour) + \":\";");
+Feedback1101Replace("gml_Object_o41_Game_Draw_0",
+    "UFO50_CHS_draw_text(viewx + 8, viewy + 8, clockString);",
+    "if(global.language==global.LANG_JAPANESE) UFO50_CHS_draw_labeled_number(viewx+8,viewy+8,(clockHour<12 ? \"下午 \" : \"上午 \"),clockString,fa_left); else UFO50_CHS_draw_text(viewx + 8, viewy + 8, clockString);");
+Feedback1101Replace("gml_Object_o41_Game_Draw_0",
+    "UFO50_CHS_draw_text(viewx + 8, viewy + 16, clockString);",
+    "if(global.language==global.LANG_JAPANESE) UFO50_CHS_draw_labeled_number(viewx+8,viewy+8+max(8,ceil(string_height(\"中\"))+3),(clockHour<12 ? \"下午 \" : \"上午 \"),clockString,fa_left); else UFO50_CHS_draw_text(viewx + 8, viewy + 16, clockString);");
+Feedback1101Replace("gml_Object_o50_Game_Draw_0",
+    "UFO50_CHS_draw_avianos_mixed(TRANS_LEFT + 8, windowTop + 8, \"STAY\");",
+    "UFO50_CHS_draw_avianos_mixed(TRANS_LEFT + 8, windowTop + 8, (global.language==global.LANG_JAPANESE ? \"留守\" : \"STAY\"));");
+Feedback1101Replace("gml_Object_o50_Game_Draw_0",
+    "UFO50_CHS_draw_avianos_mixed(TRANS_LEFT + 104, windowTop + 8, \"MOVE\");",
+    "UFO50_CHS_draw_avianos_mixed(TRANS_LEFT + 104, windowTop + 8, (global.language==global.LANG_JAPANESE ? \"移动\" : \"MOVE\"));");
+var f1101avianCode=GetDecompiledText(Data.Code.ByName("gml_Object_o50_Game_Draw_0"),new GlobalDecompileContext(Data));
+var f1101avianSprite=f1101avianCode.Contains("QA_draw_sprite(s50_All")?"QA_draw_sprite":"draw_sprite";
+Feedback1101Replace("gml_Object_o50_Game_Draw_0",
+    f1101avianSprite+"(s50_All, 0, TRANS_LEFT + 56, windowTop + 8);",
+    "if(global.language==global.LANG_JAPANESE) {var _oldColor50=draw_get_color();draw_set_color(make_color_rgb(255,164,54));UFO50_CHS_draw_avianos_mixed(TRANS_LEFT+56,windowTop+8,\"全部\");draw_set_color(_oldColor50);} else "+f1101avianSprite+"(s50_All, 0, TRANS_LEFT + 56, windowTop + 8);");
+
 // 覆盖门禁：新增数字或动态字符串绘制点也必须进入统一字体路由。
 var bypassedDraws = Data.Code.Where(code => code.Offset == 0 && !wrapperCodes.Contains(code))
     .Where(code => code.Instructions.Any(instruction => instruction.Kind == UndertaleInstruction.Opcode.Call &&

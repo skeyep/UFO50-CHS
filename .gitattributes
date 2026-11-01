@@ -9,6 +9,8 @@
 # Files covered by payload-manifest.json must keep their exact release bytes.
 /Install-UFO50-CHS.cmd -text
 /Uninstall-UFO50-CHS.cmd -text
+/Check-UFO50-CHS.cmd -text
+/distribution/** -text
 /README.txt -text
 /THIRD-PARTY-NOTICES.md -text
 /release-config.json -text

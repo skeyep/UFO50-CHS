@@ -1,16 +1,31 @@
 {
-  "version": "1.2.4",
-  "generatedAt": "2026-10-19T06:58:11.6500533Z",
+  "version": "1.2.5",
+  "generatedAt": "2026-11-01T04:02:21.0591177Z",
   "files": [
+    {
+      "path": "Check-UFO50-CHS.cmd",
+      "sha256": "C4A3BD8D1259FB8B6CD19FB838E908F41A46B48805E34659E9BA0DAC90FA4543",
+      "size": 259
+    },
+    {
+      "path": "distribution/Install-UFO50-CHS.cmd",
+      "sha256": "4639FEDB779A1D6C7E70FB77C00067C1A1F7CCFF3D49CB15FC7F7751EA7E6BD5",
+      "size": 364
+    },
     {
       "path": "Install-UFO50-CHS.cmd",
       "sha256": "EA0DC26DF325B2E4AC6400CF98DF4F6473305068D1195F5EE85E533E919BA45B",
       "size": 354
     },
     {
+      "path": "installer/Check-UFO50-CHS.ps1",
+      "sha256": "ABB042F51C9CA16DAAB0742A7BE6D58608447EAB61E89C9ABDE947DC41C08462",
+      "size": 1108
+    },
+    {
       "path": "installer/Common.ps1",
-      "sha256": "3B70FB2E89A549F62E94AFAB371D9B12FDCE0CCF00D1117BB71CE77A39B89A80",
-      "size": 6745
+      "sha256": "75863B8074A6E78344E7BB5D8C7089C72D1240101802340573CF1D08DF851EEB",
+      "size": 6858
     },
     {
       "path": "installer/Install-UFO50-CHS.ps1",
@@ -114,8 +129,8 @@
     },
     {
       "path": "payload/ext/JAPANESE/25_Text.json",
-      "sha256": "A9886D9E31586B6026A6FDDAD11D7E727EC7AAC59204B918F3A080D3B3657F5D",
-      "size": 11260
+      "sha256": "D2146B2F9C38EFB7B01AF9C516A305124D19F897B5C6D3AE16D5AAA129D288F5",
+      "size": 10976
     },
     {
       "path": "payload/ext/JAPANESE/26_Text.json",
@@ -254,7 +269,7 @@
     },
     {
       "path": "payload/ext/JAPANESE/50_Text.json",
-      "sha256": "D0A618A66FC4DB220CB8AD676ADA213A09AF2654B3497695A6825422AC49BFAE",
+      "sha256": "FF05750E7412C80ABB596669F30A9CB65C95D10AC72F1834FB679335C3F850F1",
       "size": 23056
     },
     {
@@ -284,17 +299,17 @@
     },
     {
       "path": "payload/patch-font.csx",
-      "sha256": "2B811A11E3463B96DFCB4B1606B6C7F7AFF2161AC3158160A61DCD2329BF6F3A",
-      "size": 337382
+      "sha256": "1EBD9FAE39C76C02770F6E21958F74CC29E4A7A3EE2FBD9200F110B7A90F16D2",
+      "size": 342619
     },
     {
       "path": "README.txt",
-      "sha256": "5B19A41456572A8F96902C8E814438C42CBC87A1CAE7B590B2A5FD2D01020B0D",
-      "size": 1579
+      "sha256": "1DA937F18FAD2D25BFC073EDF37F6C4EC092D909A91979A8960E0D7ED35AE406",
+      "size": 1685
     },
     {
       "path": "release-config.json",
-      "sha256": "9BBED95B562F693A54E7911B37E2E0677FA7496308276E25F06416B653E65065",
+      "sha256": "9739515CC7C7C8786A0A2D05A85214DFE457AE43C0A5154271FE164F7F04D1EE",
       "size": 869
     },
     {

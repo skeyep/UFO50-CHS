@@ -29,6 +29,7 @@ function Resolve-UFO50GamePath {
     Add-PathCandidate -Candidates $directCandidates -Path $ExplicitPath
     Add-PathCandidate -Candidates $directCandidates -Path $PackageRoot
     Add-PathCandidate -Candidates $directCandidates -Path (Split-Path -Parent $PackageRoot)
+    Add-PathCandidate -Candidates $directCandidates -Path (Split-Path -Parent (Split-Path -Parent $PackageRoot))
 
     $steamRoots = New-Object 'System.Collections.Generic.List[string]'
     foreach ($registryPath in @(

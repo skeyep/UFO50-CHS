@@ -45,19 +45,24 @@ $utmtSource = Get-ReleaseDependency -Uri $config.utmt.sourceUrl -Destination (Jo
 & (Join-Path $PSScriptRoot 'validate-repository.ps1')
 
 $dist = Join-Path $root 'dist'
-$stage = Join-Path $dist ("stage-" + [guid]::NewGuid().ToString('N'))
+$stage = [IO.Path]::GetFullPath((Join-Path $dist ("stage-" + [guid]::NewGuid().ToString('N'))))
+$distPrefix = [IO.Path]::GetFullPath($dist).TrimEnd('\') + '\'
+if (-not $stage.StartsWith($distPrefix, [StringComparison]::OrdinalIgnoreCase)) { throw 'Invalid release staging path.' }
 $name = "UFO50-CHS-v$Version"
 $package = Join-Path $stage $name
+$packageData = Join-Path $package 'UFO50-CHS'
 $zip = Join-Path $dist ($name + '.zip')
-New-Item -ItemType Directory -Force -Path $package | Out-Null
+New-Item -ItemType Directory -Force -Path $packageData | Out-Null
 
 try {
-    foreach ($item in @('Install-UFO50-CHS.cmd','Uninstall-UFO50-CHS.cmd','README.txt','THIRD-PARTY-NOTICES.md','release-config.json','installer','payload')) {
-        Copy-Item -LiteralPath (Join-Path $root $item) -Destination $package -Recurse
+    Copy-Item -LiteralPath (Join-Path $root 'distribution\Install-UFO50-CHS.cmd') -Destination $package
+    Copy-Item -LiteralPath (Join-Path $root 'README.txt') -Destination $package
+    foreach ($item in @('Uninstall-UFO50-CHS.cmd','Check-UFO50-CHS.cmd','THIRD-PARTY-NOTICES.md','release-config.json','installer','payload')) {
+        Copy-Item -LiteralPath (Join-Path $root $item) -Destination $packageData -Recurse
     }
 
-    $zpixRoot = Join-Path $package 'third-party\zpix'
-    $utmtRoot = Join-Path $package 'third-party\UndertaleModTool'
+    $zpixRoot = Join-Path $packageData 'third-party\zpix'
+    $utmtRoot = Join-Path $packageData 'third-party\UndertaleModTool'
     New-Item -ItemType Directory -Force -Path $zpixRoot,$utmtRoot | Out-Null
     Copy-Item -LiteralPath $zpixFile -Destination (Join-Path $zpixRoot 'zpix.ttf')
     Copy-Item -LiteralPath (Join-Path $root 'docs\third-party\ZPIX-README.md') -Destination (Join-Path $zpixRoot 'README-and-license.md')
@@ -65,8 +70,8 @@ try {
     Copy-Item -LiteralPath $utmtSource -Destination (Join-Path $utmtRoot "UndertaleModTool-$($config.utmt.version)-source.zip")
     Copy-Item -LiteralPath (Join-Path $root 'docs\third-party\UTMT-GPL-3.0.txt') -Destination (Join-Path $utmtRoot 'LICENSE-GPL-3.0.txt')
 
-    $entries = foreach ($file in Get-ChildItem -LiteralPath $package -Recurse -File | Sort-Object FullName) {
-        $relative = $file.FullName.Substring($package.Length + 1).Replace('\', '/')
+    $entries = foreach ($file in Get-ChildItem -LiteralPath $packageData -Recurse -File | Sort-Object FullName) {
+        $relative = $file.FullName.Substring($packageData.Length + 1).Replace('\', '/')
         [ordered]@{
             path = $relative
             sha256 = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToUpperInvariant()
@@ -77,7 +82,7 @@ try {
         version = $Version
         generatedAt = (Get-Date).ToUniversalTime().ToString('o')
         files = @($entries)
-    } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $package 'payload-manifest.json') -Encoding UTF8
+    } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $packageData 'payload-manifest.json') -Encoding UTF8
 
     $forbidden = @(Get-ChildItem -LiteralPath $package -Recurse -File | Where-Object {
         $_.Extension -eq '.win' -or

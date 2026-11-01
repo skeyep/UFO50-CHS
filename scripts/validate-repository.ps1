@@ -7,6 +7,7 @@ $required = @(
     'THIRD-PARTY-NOTICES.md', 'release-config.json', 'payload-manifest.json',
     'docs\third-party\ZPIX-README.md', 'docs\third-party\UTMT-GPL-3.0.txt',
     'installer\Common.ps1', 'installer\Install-UFO50-CHS.ps1', 'installer\Uninstall-UFO50-CHS.ps1',
+    'installer\Check-UFO50-CHS.ps1', 'Check-UFO50-CHS.cmd', 'distribution\Install-UFO50-CHS.cmd',
     'payload\patch-font.csx',
     'source\builders\audit-game51.mjs', 'source\builders\audit-layout.py',
     'source\builders\build-game51-review.mjs', 'source\translations\game-51-human-zh.json'

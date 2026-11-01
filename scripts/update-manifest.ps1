@@ -8,6 +8,8 @@ if ([string]::IsNullOrWhiteSpace($Version)) { $Version = [string]$config.version
 $paths = @(
     'Install-UFO50-CHS.cmd',
     'Uninstall-UFO50-CHS.cmd',
+    'Check-UFO50-CHS.cmd',
+    'distribution\Install-UFO50-CHS.cmd',
     'README.txt',
     'THIRD-PARTY-NOTICES.md',
     'release-config.json'
