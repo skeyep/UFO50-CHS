@@ -1,6 +1,6 @@
 {
-  "version": "1.2.8",
-  "generatedAt": "2026-11-01T08:24:23.4196503Z",
+  "version": "1.2.9",
+  "generatedAt": "2026-11-26T16:56:15.2159122Z",
   "files": [
     {
       "path": "Check-UFO50-CHS.cmd",
@@ -56,6 +56,11 @@
       "path": "payload/assets/rail-mission-titles.png",
       "sha256": "46E6770BA6D1EAA4F3161ADBF66AA79F2609CFA0BA1FF92DA91749EFAEAF5D6E",
       "size": 9516
+    },
+    {
+      "path": "payload/assets/rail-status.png",
+      "sha256": "CC08715040CEED3969492270CEAA9098989D1E491BC6F5D4211BCEF79EC2CB5C",
+      "size": 7397
     },
     {
       "path": "payload/ext/JAPANESE/0_Text.json",
@@ -319,8 +324,8 @@
     },
     {
       "path": "payload/patch-font.csx",
-      "sha256": "80D5536610E327C00D0D8DBB13C4FAA54E8BB4ACCF3DE2D95BE97958E898C5B9",
-      "size": 348937
+      "sha256": "5FE8A46039BA18EFE6FD13D8E2DE752CB606CAB33322CDF91C9E17FC448D43AA",
+      "size": 350882
     },
     {
       "path": "README.txt",
@@ -329,7 +334,7 @@
     },
     {
       "path": "release-config.json",
-      "sha256": "649C939EC3EC65A46326EA7E75B1DB8972D644DBE0F78124EC93F678372EDAE6",
+      "sha256": "49A2592FCEE0B4FD26D0995AD9A503D10AFCB58F16EB61C4C2F562EA24438B27",
       "size": 869
     },
     {

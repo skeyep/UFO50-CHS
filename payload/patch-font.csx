@@ -52,6 +52,7 @@ void AppendArtTitleFrames(string spriteName, string assetName, int expectedFrame
 }
 AppendArtTitleFrames("s13_MissionBrief", "rail-mission-titles.png", 8, 96, 24, 20, 384, 216);
 AppendArtTitleFrames("s13_MissionBrief", "rail-ending.png", 28, 24, 26, 1, 384, 216);
+AppendArtTitleFrames("s13_MissionBrief", "rail-status.png", 29, 160, 32, 10, 384, 216);
 AppendArtTitleFrames("s42_Star", "fighters-play-mode.png", 3, 88, 20, 1, 88, 32);
 
 var initFonts = """
@@ -5186,6 +5187,27 @@ Feedback1101Replace("gml_Object_o13_Game_Draw_0",
 Feedback1101Replace("gml_Object_o13_Game_Draw_0",
     "draw_text_centered(viewx + 192, viewy + 32, scrStringEven(\"the_end\", 3), 16);",
     "if (global.language == global.LANG_JAPANESE) draw_sprite(s13_MissionBrief, 28, viewx + 180, viewy + 32); else draw_text_centered(viewx + 192, viewy + 32, scrStringEven(\"the_end\", 3), 16);");
+
+// Rail status headings use white face pixels and a black shadow. The caller's
+// palette tints the face and the original branches still control visibility.
+void RailStatusArt(int frame, string center, int y, string original, string condition = "")
+{
+    var localized = "global.language == global.LANG_JAPANESE" + condition;
+    Feedback1101Replace("gml_Object_o13_Game_Draw_0", original,
+        $"if ({localized}) draw_sprite_ext(s13_MissionBrief, {frame}, ({center}) - 80, viewy + {y}, 1, 1, 0, draw_get_color(), draw_get_alpha()); else {original}");
+}
+RailStatusArt(29, "viewx + 192", 8, "draw_text_centered(viewx + 192, viewy + 8, scrStringExt(\"time_up\", \"*\", 32, 4), 16);");
+RailStatusArt(30, "centerX", 8, "draw_text_centered(centerX, viewy + 8, scrStringExt(\"passed_turn\", \"*\", 32, 4), 16);");
+RailStatusArt(31, "centerX", 8, "draw_text_centered(centerX, viewy + 8, scrStringExt(\"turn_ended\", \"*\", 32, 4), 16);");
+RailStatusArt(32, "centerX", 32, "draw_text_centered(centerX, viewy + 32, scrStringExt(\"you_have_won\", \"*\", 32, 4), 16);");
+RailStatusArt(33, "centerX", 32, "draw_text_centered(centerX, viewy + 32, scrStringExt(\"game_over\", \"*\", 32, 4), 16);");
+RailStatusArt(34, "centerX", 32, "draw_text_centered(centerX, viewy + 32, scrStringExt(\"outlaws_won\", \"*\", 32, 4), 16);");
+RailStatusArt(35, "centerX", 32, "draw_text_centered(centerX, viewy + 32, scrStringExt(\"lawmen_won\", \"*\", 32, 4), 16);");
+RailStatusArt(36, "centerX", 32, "draw_text_centered(centerX, viewy + 32, scrStringExt(\"draw\", \"*\", 32, 4), 16);");
+RailStatusArt(37, "centerX", 96, "draw_text_centered(centerX, viewy + 96, scrStringExt(\"get_ready\", lvl, 32, 4), 16);");
+RailStatusArt(38, "viewx + 192", 64,
+    "scrStringDrawCenterAltExt(viewx + 192, viewy + 64, messageContent, \"*\", 32, 4);",
+    " && messageContent == \"lawmen_turn\"");
 Feedback1101Replace("gml_Object_o42_Game_Draw_0",
     "scrStringDrawCenterExt(\"play_mode\", 0, 72, 8, 384, 0, 0, 4);",
     "if (global.language == global.LANG_JAPANESE) draw_sprite(s42_Star, 3, 148, 72); else scrStringDrawCenterExt(\"play_mode\", 0, 72, 8, 384, 0, 0, 4);");

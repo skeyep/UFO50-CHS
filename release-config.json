@@ -1,7 +1,7 @@
 {
-  "version": "1.2.8",
+  "version": "1.2.9",
   "supportedDataWinSha256": "8C8FB143FAEDC8AB1F14D4AB288A4B2CD1F9A286E43DE1B5E83ED8EDE8266B29",
-  "patchedDataWinSha256": "4DB097144826255E1761F1B2A1B2E22927A41E1B25AC76B7387EFD33BBC87627",
+  "patchedDataWinSha256": "3DF7117C2916BA2C806982E42F0FDAF77500DD2A2BC92770BABD4F7DBB84D70B",
   "zpix": {
     "version": "v3.1.11",
     "url": "https://github.com/SolidZORO/zpix-pixel-font/releases/download/v3.1.11/zpix.ttf",
